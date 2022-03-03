@@ -11,7 +11,7 @@ require './inc/db.php';
 if (empty($config->bot_class)) {
     $bot = new TTBot($config->token);
 } else {
-    $bot = new ($config->bot_class)($config->token);
+    $bot = new $config->bot_class($config->token);
 }
 
 $bot->processWebhook();
