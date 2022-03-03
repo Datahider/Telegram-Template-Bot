@@ -1,0 +1,31 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 28 февр. 2022 г., 22:52:40
+    Author     : drweb
+*/
+
+#setup-form label {
+    width: 200px;
+    display: block;
+    float: left;
+}
+#setup-form label:after {
+    content: ':';
+}
+
+#setup-submit {
+    padding-left: 200px;
+}
+
+#setup-form > div > div {
+    padding-bottom: 10px;
+}
+#setup-db > div > input, #input-bot-admin {
+    width: 200px;
+}
+#input-bot-token, #input-bot-webhook {
+    width: 400px;
+}
