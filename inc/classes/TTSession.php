@@ -75,7 +75,7 @@ class TTSession {
         }
     }
     
-    public function set($param_name, $param_value) {
+    public function set($param_name, $param_value, $persistent=true) {
         switch ($param_name) {
             case 'user':
             case 'chat':
@@ -85,7 +85,9 @@ class TTSession {
         }
         
         $this->data[$param_name] = $param_value;
-        $this->sqlSetSessionParam($param_name, $param_value);
+        if ($persistent) {
+            $this->sqlSetSessionParam($param_name, $param_value);
+        }
     }
     
     public function sqlSetSessionParam($param_name, $param_value) {
