@@ -53,6 +53,8 @@ class TTSession {
     }
     
     public function get($param_name) {
+        global $config;
+        
         switch ($param_name) {
             case 'user':
                 return $this->user;
@@ -63,6 +65,9 @@ class TTSession {
             case 'chat_id':
                 return $this->chat_id;
             default:
+                if (isset($config->session_static[$param_name])) {
+                    return $config->session_static[$param_name];
+                }
                 return $this->data[$param_name];
         }
     }
