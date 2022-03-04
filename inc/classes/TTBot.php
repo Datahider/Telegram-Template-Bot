@@ -139,4 +139,13 @@ class TTBot extends Api {
             $this->sqlInsertHistory($chat_id, $from_id, $is_text, $history_data);
         }
     }
+    
+    public function replaceVars($text) {
+        preg_match_all("/\{\{([^}]+)\}\}/", $text, $matches, PREG_SET_ORDER);
+        $count = 1;
+        foreach ( $matches as $match ) {
+            $text = str_replace($match[0], $this->session()->get($match[1], '--UNSET--'), $text, $count);
+        }
+        return $text;
+    }
 }
