@@ -82,7 +82,8 @@ class TTBot extends Api {
     public function getWebhookUpdates(): \Telegram\Bot\Objects\Update {
         $update = parent::getWebhookUpdates();
         
-        $this->writeUpdateHistory($update);
+        $this->initSession($update);
+        $this->writeUpdateHistory();
         return $update;
     }
 
@@ -90,7 +91,8 @@ class TTBot extends Api {
         $data = parent::getUpdates($params);
         
         foreach ($data as $update) {
-            $this->writeUpdateHistory($update);
+            $this->initSession($update);
+            $this->writeUpdateHistory();
         }
         return $data;
     }
@@ -113,38 +115,65 @@ class TTBot extends Api {
         ]);        
     }
 
-    protected function writeUpdateHistory($update) {
-        
-        $message = $update->getMessage();
-        if ($message) {
-            if ($message->getText()) {
-                $history_data = $message->getText();
-                $is_text = true;
-            } else {
-                $history_data = print_r($message, true);
-                $is_text = false;
+    protected function initSession($update) {
+        try {
+            $this->initSessionByMessage($update);
+            $this->initSessionByCallbackQuery($update);
+            // TODO - 
+            // $this->initSessionByEditedMessage($update)
+            // $this->initSessionByChannelPost($update)
+            // $this->initSessionByEditedChannelPost($update)
+            // $this->initSessionByInlineQuery($update)
+            // $this->initSessionByChosenInlineResult($update)
+            // $this->initSessionByShippingQuery($update)
+            // $this->initSessionByPreCheckoutQuery($update)
+            // $this->initSessionByPool($update)
+            // $this->initSessionByPoolAnswer($update)
+            // $this->initSessionByMyChatMember($update)
+            // $this->initSessionByChatMember($update)
+            // $this->initSessionByChatJoinRequest($update)
+        } catch (Exception $ex) {
+            if ($ex->getMessage() != 'Session initialized') {
+                throw $ex;
             }
-        
-            $from = $message->getFrom();
-            if ($from) {
-                $from_id = $from->getId();
-            } else {
-                $from_id = -1;
-            }
-            $chat = $message->getChat();
-            $chat_id = $chat->getId();
-            
-            $this->session = new TTSession($from, $chat);
-
-            $this->sqlInsertHistory($chat_id, $from_id, $is_text, $history_data);
         }
+    }
+
+    protected function initSessionByMessage($update) {
+        $message = $update->get('message');
+        if (!$message) { return; }
+
+        $from = $message->getFrom();
+        $chat = $message->getChat();
+        $this->session = new TTSession($from, $chat);   
+        $text = $message->getText();
+        
+        if ($text) {
+            $this->session->set('current_history_data', $text, false);
+            $this->session->set('current_history_is_text', true, false);
+        } else {
+            $this->session->set('current_history_data', '--Non-text-message--', false);
+            $this->session->set('current_history_is_text', false, false);
+        }
+        throw new Exception('Session initialized');
+    }
+    
+    
+    protected function writeUpdateHistory() {
+            $this->sqlInsertHistory(
+                    $this->session->get('chat_id'), 
+                    $this->session->get('user_id'), 
+                    $this->session->get('current_history_is_text'), 
+                    $this->session->get('current_history_data')
+            );
+        
     }
     
     public function replaceVars($text) {
         preg_match_all("/\{\{([^}]+)\}\}/", $text, $matches, PREG_SET_ORDER);
         $count = 1;
         foreach ( $matches as $match ) {
-            $text = str_replace($match[0], $this->session()->get($match[1], '--UNSET--'), $text, $count);
+            $text = str_replace($match[0], $this->session->get($match[1], '--UNSET--'), $text, $count);
         }
         return $text;
     }
