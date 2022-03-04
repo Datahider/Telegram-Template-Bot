@@ -52,7 +52,7 @@ class TTSession {
         return $sth->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    public function get($param_name) {
+    public function get($param_name, $default=null) {
         global $config;
         
         switch ($param_name) {
@@ -68,7 +68,10 @@ class TTSession {
                 if (isset($config->session_static[$param_name])) {
                     return $config->session_static[$param_name];
                 }
-                return $this->data[$param_name];
+                if (isset($this->data[$param_name])) {
+                    return $this->data[$param_name];
+                }
+                return $default;
         }
     }
     
