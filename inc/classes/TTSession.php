@@ -40,7 +40,7 @@ class TTSession {
         global $pdo, $config;
         
         $sth = $pdo->prepare("SELECT param_name, param_value "
-                . "FROM {$config->db_prefix}sessiondata"
+                . "FROM {$config->db_prefix}sessiondata "
                 . "WHERE user_id = :user_id AND chat_id = :chat_id"
         ); 
                 
