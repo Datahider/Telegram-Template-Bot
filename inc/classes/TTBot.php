@@ -18,20 +18,37 @@ class TTBot extends Api {
     protected $update;
     
     public function processUpdate($update) {
-        $text = $update->getMessage()->getText();
-        $this->sendMessage([
-            'chat_id' => $this->session()->get('chat_id'),
-            'text' => "$text\n\nRedefine processUpdate(\$update) to do something smarter"
-        ]);
+        
+        $message = $update->getMessage();
+        
+        if ($message) {
+            if (substr($message->getText(), 0, 1) == '/') {
+                return; // must be already processed
+            }
+            $this->processMessageUpdate($update);
+        } else {
+            $this->processNonMessageUpdate($update);
+        }
     }
     
+    protected function processMessageUpdate($update) {
+        $this->sendMessage([
+            'chat_id' => $update->getMessage()->getChat()->getId(),
+            'text' => 'Redefine processMessageUpdate($update) to process message updates'
+        ]);
+    }
+
+    protected function processNonMessageUpdate($update) {
+        error_log('Redefine processNonMessageUpdate($update) to process non-message updates');
+    }
+
     public function processWebhook() {
-        $update = $this->getWebhookUpdates();
+        $update = $this->commandsHandler(true);
         $this->processUpdate($update);
     }
 
     public function processUpdates() {
-        $data = $this->getUpdates();
+        $data = $this->commandsHandler(false);
         
         foreach ($data as $update) {
             $this->processUpdate($update);
