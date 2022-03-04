@@ -29,10 +29,10 @@ class TTSession {
             $this->user_id = $this->user->getId();
         }
         
-        $data = [];
+        $this->data = [];
         
         foreach ($this->sqlGetSessionData() as $param) {
-            $data[$param['param_name']] = $param['param_value'];
+            $this->data[$param['param_name']] = $param['param_value'];
         }
     }
     
