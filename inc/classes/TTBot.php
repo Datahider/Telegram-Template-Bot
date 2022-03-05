@@ -195,6 +195,16 @@ class TTBot extends Api {
         return $text;
     }
     
+    public function replaceVarsArray($array) {
+        foreach ($array as $element) {
+            if (is_array($element)) {
+                return $this->replaceVarsArray($element);
+            } else {
+                return $this->replaceVars($element);
+            }
+        }
+    }
+
     public function answerCallbackQuery($params) {
         $this->post('answerCallbackQuery', $params);
     }
