@@ -198,4 +198,8 @@ class TTBot extends Api {
     public function answerCallbackQuery($params) {
         $this->post('answerCallbackQuery', $params);
     }
+    
+    public function editMessageText($params) {
+        $this->post('editMessageText', $params);
+    }
 }
