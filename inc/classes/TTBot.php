@@ -196,11 +196,11 @@ class TTBot extends Api {
     }
     
     public function replaceVarsArray($array) {
-        foreach ($array as $element) {
-            if (is_array($element)) {
-                return $this->replaceVarsArray($element);
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->replaceVarsArray($value);
             } else {
-                return $this->replaceVars($element);
+                $array[$key] = $this->replaceVars($value);
             }
         }
         return $array;
