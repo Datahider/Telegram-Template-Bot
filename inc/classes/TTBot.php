@@ -203,6 +203,7 @@ class TTBot extends Api {
                 return $this->replaceVars($element);
             }
         }
+        return $array;
     }
 
     public function answerCallbackQuery($params) {
