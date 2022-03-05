@@ -132,6 +132,7 @@ class TTBot extends Api {
             // $this->initSessionByMyChatMember($update)
             // $this->initSessionByChatMember($update)
             // $this->initSessionByChatJoinRequest($update)
+            throw new Exception('Session not initialized');
         } catch (Exception $ex) {
             if ($ex->getMessage() != 'Session initialized') {
                 throw $ex;
@@ -158,7 +159,23 @@ class TTBot extends Api {
         throw new Exception('Session initialized');
     }
     
+    protected function initSessionByCallbackQuery($update) {
+        $callback_query = $update->get('callback_query');
+        if (!$callback_query) { return; }
+
+        $from = $callback_query->getFrom();
+        $chat = $callback_query->getMessage()->getChat();
+        $this->session = new TTSession($from, $chat);   
+        $text = 'Callback data: ' . $callback_query->get('data');
+        
+        $this->session->set('current_history_data', $text, false);
+        $this->session->set('current_history_is_text', false, false);
+
+        throw new Exception('Session initialized');
+    }
+
     
+
     protected function writeUpdateHistory() {
             $this->sqlInsertHistory(
                     $this->session->get('chat_id'), 
@@ -176,5 +193,9 @@ class TTBot extends Api {
             $text = str_replace($match[0], $this->session->get($match[1], '--UNSET--'), $text, $count);
         }
         return $text;
+    }
+    
+    public function answerCallbackQuery($params) {
+        $this->post('answerCallbackQuery', $params);
     }
 }
