@@ -63,6 +63,7 @@ class TTBot extends Api {
         
         switch ($endpoint) {
             case 'sendMessage':
+            case 'editMessageText':
                 $this->writeMessageHistory($params);
                 break;
         }
