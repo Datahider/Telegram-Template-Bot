@@ -108,7 +108,7 @@ class TTBot extends Api {
         );
 
         $sth->execute([
-            'datetime' => date(DateTime::ATOM),
+            'datetime' => date('Y-m-d H:i:s'), // MySQL date format
             'chat_id' => $chat_id,
             'user_id' => $user_id,
             'is_text' => $is_text,
