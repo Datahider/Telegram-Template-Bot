@@ -16,25 +16,44 @@ use Telegram\Bot\Api;
 class TTBot extends Api {
     protected $session;
     protected $update;
+    protected $command_processed = false;
     
+    public function commandProcessed($true=false) {
+        if ($true) {
+            $this->command_processed = true;
+        } else {
+            return $this->command_processed;
+        }
+    }
+
     public function processUpdate($update) {
         
         $message = $update->getMessage();
         
         if ($message) {
-            if (substr($message->getText(), 0, 1) == '/') {
-                return; // must be already processed
+            if ( substr($message->getText(), 0, 1) == '/' ) {
+                if ( !$this->commandProcessed() ) {
+                    $this->processNotProcessedCommand($update);
+                }
+            } else {
+                $this->processMessageUpdate($update);
             }
-            $this->processMessageUpdate($update);
         } else {
             $this->processNonMessageUpdate($update);
         }
     }
     
+    protected function processNotProcessedCommand($update) {
+        $this->sendMessage([
+            'chat_id' => $update->getMessage()->getChat()->getId(),
+            'text' => 'Redefine processNotProcessedCommand($update) to process commands not processed by Command children classes.'
+        ]);
+    }
+    
     protected function processMessageUpdate($update) {
         $this->sendMessage([
             'chat_id' => $update->getMessage()->getChat()->getId(),
-            'text' => 'Redefine processMessageUpdate($update) to process message updates'
+            'text' => 'Redefine processMessageUpdate($update) to process message updates.'
         ]);
     }
 
