@@ -210,7 +210,7 @@ class TTBot extends Api {
         preg_match_all("/\{\{([^}]+)\}\}/", $text, $matches, PREG_SET_ORDER);
         $count = 1;
         foreach ( $matches as $match ) {
-            $text = str_replace($match[0], $this->session->get($match[1], '--UNSET--'), $text, $count);
+            $text = str_replace($match[0], $this->session->get($match[1], "{{{$match[1]}}}"), $text, $count);
         }
         return $text;
     }
