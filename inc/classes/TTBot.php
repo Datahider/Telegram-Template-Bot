@@ -207,7 +207,7 @@ class TTBot extends Api {
     }
     
     public function replaceVars($text) {
-        if (!preg_match_all("/\{\{([^}]+)\}\}/", $text, $matches, PREG_SET_ORDER)) {
+        if (!preg_match_all("/\{\{([^{}]+)\}\}/", $text, $matches, PREG_SET_ORDER)) {
             return $text;
         }
         
