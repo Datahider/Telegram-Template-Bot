@@ -236,4 +236,83 @@ class TTBot extends Api {
     public function editMessageText($params) {
         $this->post('editMessageText', $params);
     }
+    
+    public function answerHTML($text, $keyboard=null, $custom_keyboard=true) {
+        $this->answer($text, 'HTML', $keyboard, $custom_keyboard);
+    }   
+    
+    public function answerMarkdown($text, $keyboard=null, $custom_keyboard=true) {
+        $this->answer($text, 'Markdown', $keyboard, $custom_keyboard);
+    }   
+    
+    public function answerMarkdownV2($text, $keyboard=null, $custom_keyboard=true) {
+        $this->answer($text, 'MarkdownV2', $keyboard, $custom_keyboard);
+    }   
+    
+    protected function answer($text, $parse_mode, $keyboard, $custom_keyboard) {
+        $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard);
+        $this->sendMessage($params);
+    }
+    
+    public function editHTML($message_id, $text, $keyboard=null, $custom_keyboard=true) {
+        $this->edit($message_id, $text, 'HTML', $keyboard, $custom_keyboard);
+    }   
+    
+    public function editMarkdown($message_id, $text, $keyboard=null, $custom_keyboard=true) {
+        $this->edit($message_id, $text, 'Markdown', $keyboard, $custom_keyboard);
+    }   
+    
+    public function editMarkdownV2($message_id, $text, $keyboard=null, $custom_keyboard=true) {
+        $this->edit($message_id, $text, 'MarkdownV2', $keyboard, $custom_keyboard);
+    }   
+    
+    protected function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard) {
+        $params = $this->prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard);
+        $this->editMessageText($params);
+    }
+    
+    protected function prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard) {
+        $params = [
+            'chat_id' => $this->session->get('chat_id'),
+            'text' => $this->replaceVars($text),
+            'parse_mode' => $parse_mode,
+        ];
+        
+        $reply_markup = $this->prepareReplyMarkup($keyboard, $custom_keyboard);
+        if ($reply_markup) {
+            $params['reply_markup'] = $reply_markup;
+        }
+
+        if ($message_id !== null) {
+            $params['message_id'] = $message_id;
+        }
+        
+        return $params;
+    }
+
+    protected function prepareReplyMarkup($keyboard, $custom_keyboard, array $params=[]) {
+        global $config;
+
+        if ($keyboard === null) {
+            $key = 'remove_keyboard';
+            $reply_markup = true;
+        } elseif ($custom_keyboard === true) {
+            $key = 'keyboard';
+            if (is_string($keyboard)) {
+                $keyboard = $config->custom_keyboards[$keyboard];
+            }
+            $reply_markup = $this->replaceVarsArray($keyboard);
+        } elseif ($custom_keyboard === false) {
+            $key = 'inline_keyboard';
+            if (is_string($keyboard)) {
+                $keyboard = $config->inline_keyboards[$keyboard];
+            }
+            $reply_markup = $this->replaceVarsArray($keyboard);
+        }
+
+        $params[$key] = $reply_markup;
+        $reply_markup = $this->replyKeyboardMarkup($params);
+        return $reply_markup;
+    }
+    
 }
