@@ -207,12 +207,15 @@ class TTBot extends Api {
     }
     
     public function replaceVars($text) {
-        preg_match_all("/\{\{([^}]+)\}\}/", $text, $matches, PREG_SET_ORDER);
+        if (!preg_match_all("/\{\{([^}]+)\}\}/", $text, $matches, PREG_SET_ORDER)) {
+            return $text;
+        }
+        
         $count = 1;
         foreach ( $matches as $match ) {
             $text = str_replace($match[0], $this->session->get($match[1], "{{{$match[1]}}}"), $text, $count);
         }
-        return $text;
+        return $this->replaceVars($text);
     }
     
     public function replaceVarsArray($array) {
