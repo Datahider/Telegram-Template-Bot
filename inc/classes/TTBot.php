@@ -213,7 +213,7 @@ class TTBot extends Api {
         
         $count = 1;
         foreach ( $matches as $match ) {
-            $text = str_replace($match[0], $this->session->get($match[1], "{{$match[1]}}"), $text, $count);
+            $text = str_replace($match[0], $this->session->get($match[1], "$match[1]"), $text, $count);
         }
         return $this->replaceVars($text);
     }
