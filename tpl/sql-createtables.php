@@ -44,7 +44,7 @@ ALTER TABLE `{$config->db_prefix}chathistory`
   ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `{$config->db_prefix}sessiondata`
-  ADD PRIMARY KEY (`user_id`,`chat_id`);
+  ADD PRIMARY KEY (`user_id`,`chat_id`, `param_name`);
 
 ALTER TABLE `{$config->db_prefix}settings`
   ADD PRIMARY KEY (`param_name`);
