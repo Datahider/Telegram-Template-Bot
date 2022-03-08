@@ -249,6 +249,11 @@ class TTBot extends Api {
         $this->answer($text, 'MarkdownV2', $keyboard, $custom_keyboard);
     }   
     
+    public function answerPlainText($text, $keyboard=null, $custom_keyboard=true) {
+        $this->answer($text, '', $keyboard, $custom_keyboard);
+    }   
+    
+
     protected function answer($text, $parse_mode, $keyboard, $custom_keyboard) {
         $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard);
         $this->sendMessage($params);
@@ -266,6 +271,10 @@ class TTBot extends Api {
         $this->edit($message_id, $text, 'MarkdownV2', $keyboard, $custom_keyboard);
     }   
     
+    public function editPlainText($message_id, $text, $keyboard=null, $custom_keyboard=true) {
+        $this->edit($message_id, $text, 'MarkdownV2', $keyboard, $custom_keyboard);
+    }   
+    
     protected function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard) {
         $params = $this->prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard);
         $this->editMessageText($params);
@@ -275,8 +284,11 @@ class TTBot extends Api {
         $params = [
             'chat_id' => $this->session->get('chat_id'),
             'text' => $this->replaceVars($text),
-            'parse_mode' => $parse_mode,
         ];
+        
+        if ($parse_mode) {
+            $params['parse_mode'] = $parse_mode;
+        }
         
         $reply_markup = $this->prepareReplyMarkup($keyboard, $custom_keyboard);
         if ($reply_markup) {
