@@ -44,21 +44,15 @@ class TTBot extends Api {
     }
     
     protected function processNotProcessedCommand($update) {
-        $this->sendMessage([
-            'chat_id' => $update->getMessage()->getChat()->getId(),
-            'text' => 'Redefine processNotProcessedCommand($update) to process commands not processed by Command children classes.'
-        ]);
+        $this->answerPlainText('Override processMessageUpdate($update) to process message updates.');
     }
     
     protected function processMessageUpdate($update) {
-        $this->sendMessage([
-            'chat_id' => $update->getMessage()->getChat()->getId(),
-            'text' => 'Redefine processMessageUpdate($update) to process message updates.'
-        ]);
+        $this->answerPlainText('Override processMessageUpdate($update) to process message updates.');
     }
 
     protected function processNonMessageUpdate($update) {
-        error_log('Redefine processNonMessageUpdate($update) to process non-message updates');
+        $this->answerPlainText('Override processNonMessageUpdate($update) to process non-message updates');
     }
 
     public function processWebhook() {
