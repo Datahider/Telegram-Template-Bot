@@ -7,7 +7,7 @@
 
 require_once './tpl/header.php';
 ?>
-<link rel="stylesheet" type="text/css" media="all" href="tpl/setup.css" />
+<link rel="stylesheet" type="text/css" media="all" href="setup.css" />
 
 <script language="Javascript">
     $().ready(function() {
