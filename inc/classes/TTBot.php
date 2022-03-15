@@ -332,21 +332,25 @@ class TTBot extends Api {
         global $config;
 
         if ($keyboard === null) {
-            $reply_markup = $this->replyKeyboardHide();
+            $key = 'remove_keyboard';
+            $reply_markup = true;
         } elseif ($custom_keyboard === true) {
+            $key = 'keyboard';
             if (is_string($keyboard)) {
                 $keyboard = $config->custom_keyboards[$keyboard];
             }
-            $params['keyboard'] = $this->replaceVarsArray($keyboard);
-            $reply_markup = $this->replyKeyboardMarkup($params);
+            $reply_markup = $this->replaceVarsArray($keyboard);
         } elseif ($custom_keyboard === false) {
+            $key = 'inline_keyboard';
             if (is_string($keyboard)) {
                 $keyboard = $config->inline_keyboards[$keyboard];
             }
-            $params['inline_keyboard'] = $this->replaceVarsArray($keyboard);
-            $reply_markup = $this->replyKeyboardMarkup($params);
+            $reply_markup = $this->replaceVarsArray($keyboard);
         }
-        
+
+        $params[$key] = $reply_markup;
+        $reply_markup = $this->replyKeyboardMarkup($params);
+        error_log(print_r($reply_markup, true));
         return $reply_markup;
     }
     
