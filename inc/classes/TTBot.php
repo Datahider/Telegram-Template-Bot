@@ -350,7 +350,6 @@ class TTBot extends Api {
 
         $params[$key] = $reply_markup;
         $reply_markup = $this->replyKeyboardMarkup($params);
-        error_log(print_r($reply_markup, true));
         return $reply_markup;
     }
     
