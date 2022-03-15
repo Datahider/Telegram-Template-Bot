@@ -298,11 +298,11 @@ class TTBot extends Api {
     }   
     
     public function editPlainText($message_id, $text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
-        $this->edit($message_id, $text, 'MarkdownV2', $keyboard, $custom_keyboard, $keyboard_params);
+        $this->edit($message_id, $text, '', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
     protected function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
-        $params = $this->prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard);
+        $params = $this->prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
         $this->editMessageText($params);
     }
     
