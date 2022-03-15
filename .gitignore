@@ -2,3 +2,5 @@
 /inc/classes/TTTest.php
 /inc/classes/StartCommand.php
 /inc/classes/HelpCommand.php
+/inc/classes/SetCommand.php
+/inc/classes/GetCommand.php

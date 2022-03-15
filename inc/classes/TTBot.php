@@ -128,6 +128,38 @@ class TTBot extends Api {
             'history_data' => $history_data
         ]);        
     }
+    
+    public function getOption($name, $default=null) {
+        global $config, $pdo;
+        $sql = "SELECT param_value FROM {$config->db_prefix}settings WHERE param_name = :option_name";
+        $sth = $pdo->prepare($sql);
+        
+        $sth->execute([
+            'option_name' => $name
+        ]);
+        
+        $value = $sth->fetchColumn(0);
+        if ( $value === false ) {
+            return $default;
+        } else {
+            return $value;
+        }
+    }
+    
+    public function setOption($name, $value) {
+        global $config, $pdo;
+        $sth = $pdo->prepare(
+                "INSERT INTO {$config->db_prefix}settings (param_name, param_value)"
+                . "VALUES (:param_name, :param_value) "
+                . "ON DUPLICATE KEY UPDATE param_value = :param_value"
+        );
+                
+        $sth->execute([
+            'param_name' => $name,
+            'param_value' => $value
+        ]);
+        
+    }
 
     protected function initSession($update) {
         try {
