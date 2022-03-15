@@ -44,7 +44,7 @@ class TTBot extends Api {
     }
     
     protected function processNotProcessedCommand($update) {
-        $this->answerPlainText('Override processMessageUpdate($update) to process message updates.');
+        $this->answerPlainText('Override processNotProcessedCommand($update) to process commands not processed by Command children classes.');
     }
     
     protected function processMessageUpdate($update) {
