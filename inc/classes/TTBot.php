@@ -263,50 +263,50 @@ class TTBot extends Api {
         $this->post('editMessageText', $params);
     }
     
-    public function answerHTML($text, $keyboard=null, $custom_keyboard=true) {
-        $this->answer($text, 'HTML', $keyboard, $custom_keyboard);
+    public function answerHTML($text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $this->answer($text, 'HTML', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
-    public function answerMarkdown($text, $keyboard=null, $custom_keyboard=true) {
-        $this->answer($text, 'Markdown', $keyboard, $custom_keyboard);
+    public function answerMarkdown($text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $this->answer($text, 'Markdown', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
-    public function answerMarkdownV2($text, $keyboard=null, $custom_keyboard=true) {
-        $this->answer($text, 'MarkdownV2', $keyboard, $custom_keyboard);
+    public function answerMarkdownV2($text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $this->answer($text, 'MarkdownV2', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
-    public function answerPlainText($text, $keyboard=null, $custom_keyboard=true) {
-        $this->answer($text, '', $keyboard, $custom_keyboard);
+    public function answerPlainText($text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $this->answer($text, '', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
 
-    protected function answer($text, $parse_mode, $keyboard, $custom_keyboard) {
-        $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard);
+    protected function answer($text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
+        $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
         $this->sendMessage($params);
     }
     
-    public function editHTML($message_id, $text, $keyboard=null, $custom_keyboard=true) {
-        $this->edit($message_id, $text, 'HTML', $keyboard, $custom_keyboard);
+    public function editHTML($message_id, $text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $this->edit($message_id, $text, 'HTML', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
-    public function editMarkdown($message_id, $text, $keyboard=null, $custom_keyboard=true) {
-        $this->edit($message_id, $text, 'Markdown', $keyboard, $custom_keyboard);
+    public function editMarkdown($message_id, $text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $this->edit($message_id, $text, 'Markdown', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
-    public function editMarkdownV2($message_id, $text, $keyboard=null, $custom_keyboard=true) {
-        $this->edit($message_id, $text, 'MarkdownV2', $keyboard, $custom_keyboard);
+    public function editMarkdownV2($message_id, $text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $this->edit($message_id, $text, 'MarkdownV2', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
-    public function editPlainText($message_id, $text, $keyboard=null, $custom_keyboard=true) {
-        $this->edit($message_id, $text, 'MarkdownV2', $keyboard, $custom_keyboard);
+    public function editPlainText($message_id, $text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $this->edit($message_id, $text, 'MarkdownV2', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
-    protected function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard) {
+    protected function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
         $params = $this->prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard);
         $this->editMessageText($params);
     }
     
-    protected function prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard) {
+    protected function prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
         $params = [
             'chat_id' => $this->session->get('chat_id'),
             'text' => $this->replaceVars($text),
@@ -316,7 +316,7 @@ class TTBot extends Api {
             $params['parse_mode'] = $parse_mode;
         }
         
-        $reply_markup = $this->prepareReplyMarkup($keyboard, $custom_keyboard);
+        $reply_markup = $this->prepareReplyMarkup($keyboard, $custom_keyboard, $keyboard_params);
         if ($reply_markup) {
             $params['reply_markup'] = $reply_markup;
         }
