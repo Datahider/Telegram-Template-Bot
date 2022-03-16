@@ -18,6 +18,16 @@ class TTBot extends Api {
     protected $update;
     protected $command_processed = false;
     
+    public function isBotAdmin() {
+        global $config;
+        $admins = is_array($config->admin) ? $config->admin : [$config->admin];
+        if (array_search($this->session->get('user_id'), $admins) === false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
     public function commandProcessed($true=false) {
         if ($true) {
             $this->command_processed = true;
