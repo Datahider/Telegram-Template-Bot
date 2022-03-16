@@ -32,7 +32,11 @@ class TTSession {
         $this->data = [];
         
         foreach ($this->sqlGetSessionData() as $param) {
-            $this->data[$param['param_name']] = $param['param_value'];
+            $value = unserialize($param['param_value']);
+            if ($value === false && serialize($value) != $param['param_value']) {
+                $value = $param['param_value'];
+            }
+            $this->data[$param['param_name']] = $value;
         }
     }
     
@@ -103,7 +107,7 @@ class TTSession {
             'chat_id' => $this->chat_id,
             'user_id' => $this->user_id,
             'param_name' => $param_name,
-            'param_value' => $param_value
+            'param_value' => serialize($param_value)
         ]);
     }
 }

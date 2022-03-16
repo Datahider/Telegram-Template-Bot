@@ -152,7 +152,11 @@ class TTBot extends Api {
         if ( $value === false ) {
             return $default;
         } else {
-            return $value;
+            $unserialized = unserialize($value);
+            if ($unserialized === false && serialize($unserialized) != $value) {
+                return $value;
+            }
+            return $unserialized;
         }
     }
     
@@ -166,7 +170,7 @@ class TTBot extends Api {
                 
         $sth->execute([
             'param_name' => $name,
-            'param_value' => $value
+            'param_value' => serialize($value)
         ]);
         
     }
