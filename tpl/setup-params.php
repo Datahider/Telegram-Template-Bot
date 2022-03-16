@@ -26,8 +26,12 @@ require_once './tpl/header.php';
             <input type="text" name="input-bot-webhook" id="input-bot-webhook" readonly="true"/>
         </div>
         <div id="setup-bot-admin">
-            <label id="label-bot-admin">Телеграм администратора</label>
-            <input type="text" name="input-bot-admin" id="input-bot-admin" placeholder="@progmagic"/>
+            <label id="label-bot-admin">Телеграм id администратора</label>
+            <input type="text" name="input-bot-admin" id="input-bot-admin" placeholder="111222333"/>
+        </div>
+        <div id="setup-bot-class">
+            <label id="label-bot-class">Имя класса</label>
+            <input type="text" name="input-bot-class" id="input-bot-class" placeholder="MyBotClass"/>
         </div>
     </div>
     <div id="setup-db">

@@ -141,6 +141,7 @@ if ( $request_method == 'GET') {
         'token' => filter_input(INPUT_POST, 'input-bot-token'),
         'webhook' => filter_input(INPUT_POST, 'input-bot-webhook'),
         'admin' => filter_input(INPUT_POST, 'input-bot-admin'),
+        'bot_class' => filter_input(INPUT_POST, 'input-bot-class'),
 
         'db_host' => filter_input(INPUT_POST, 'input-db-host'),
         'db_name' => filter_input(INPUT_POST, 'input-db-name'),
