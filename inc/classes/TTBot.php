@@ -150,6 +150,9 @@ class TTBot extends Api {
         
         $value = $sth->fetchColumn(0);
         if ( $value === false ) {
+            if (isset($config->$name)) {
+                return $config->$name;
+            }
             return $default;
         } else {
             $unserialized = unserialize($value);
@@ -173,6 +176,14 @@ class TTBot extends Api {
             'param_value' => serialize($value)
         ]);
         
+    }
+    
+    public function unsetOption($name) {
+        global $config, $pdo;
+        $sth = $pdo->prepare(
+            "DELETE FROM {$config->db_prefix}settings WHERE param_name = :param_name"
+        );
+        $sth->execute([ 'param_name' => $name ]);
     }
 
     protected function initSession($update) {

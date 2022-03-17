@@ -4,3 +4,4 @@
 /inc/classes/HelpCommand.php
 /inc/classes/SetCommand.php
 /inc/classes/GetCommand.php
+/inc/classes/UnsetCommand.php
