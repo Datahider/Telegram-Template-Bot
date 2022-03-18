@@ -264,7 +264,16 @@ class TTBot extends Api {
         
         $count = 1;
         foreach ( $matches as $match ) {
-            $text = str_replace($match[0], $this->session->get($match[1], "$match[1]"), $text, $count);
+            if (preg_match("/^file\:(.+)$/", $match[1], $filematches)) {
+                ob_start();
+                include "tpl/$filematches[1]";
+                $text = ob_get_clean();
+                if (!$text) {
+                    $text = $match[1];
+                }
+            } else {
+                $text = str_replace($match[0], $this->session->get($match[1], "$match[1]"), $text, $count);
+            }
         }
         return $this->replaceVars($text);
     }
