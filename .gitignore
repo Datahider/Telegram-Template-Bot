@@ -5,3 +5,4 @@
 /inc/classes/SetCommand.php
 /inc/classes/GetCommand.php
 /inc/classes/UnsetCommand.php
+/tpl/select.php
