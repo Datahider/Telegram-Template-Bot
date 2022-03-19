@@ -6,6 +6,8 @@
  * @author drweb
  */
 class TTSession {
+    const MAGIC = 'KpLd4d8oku_fZiPWtmAaad9uMPdZNrxY3Js4GdEdpN';
+    
     protected $user;
     protected $chat;
     protected $data;
@@ -91,6 +93,18 @@ class TTSession {
         $this->data[$param_name] = $param_value;
         if ($persistent) {
             $this->sqlSetSessionParam($param_name, $param_value);
+        }
+    }
+    
+    public function setParams(array $params, $value=self::MAGIC) {
+        if ($value == self::MAGIC) {
+            foreach ($params as $key => $value) {
+                $this->set($key, $value);
+            } 
+        } else {
+            foreach ($params as $key) {
+                $this->set($key, $value);
+            }
         }
     }
     
