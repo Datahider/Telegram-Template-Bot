@@ -221,8 +221,8 @@ class TTBot extends Api {
             // $this->initSessionByPreCheckoutQuery($update)
             // $this->initSessionByPool($update)
             // $this->initSessionByPoolAnswer($update)
-            // $this->initSessionByMyChatMember($update)
-            // $this->initSessionByChatMember($update)
+            $this->initSessionByMyChatMember($update);
+            $this->initSessionByChatMember($update);
             // $this->initSessionByChatJoinRequest($update)
             throw new Exception('Session not initialized');
         } catch (Exception $ex) {
@@ -232,6 +232,34 @@ class TTBot extends Api {
         }
     }
 
+    protected function initSessionByMyChatMember($update) {
+        $chat_member_update = $update->get('my_chat_member');
+        if (!$chat_member_update) {
+            return;
+        }
+        
+        $this->initSessionByChatmemberUpdateObject($chat_member_update);
+    }
+    
+    protected function initSessionByChatMember($update) {
+        $chat_member_update = $update->get('chat_member');
+        if (!$chat_member_update) {
+            return;
+        }
+        
+        $this->initSessionByChatmemberUpdateObject($chat_member_update);
+    }
+    
+    
+    protected function initSessionByChatmemberUpdateObject($chat_member_update) {
+        $from = $message->getFrom();
+        $chat = $message->getChat();
+        $this->session = new TTSession($from, $chat);   
+        
+        //TODO - Сделать добавление истории по этому событию
+        throw new Exception('Session initialized');
+    }
+    
     protected function initSessionByMessageObject($message) {
         $from = $message->getFrom();
         $chat = $message->getChat();
