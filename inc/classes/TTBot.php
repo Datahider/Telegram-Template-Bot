@@ -252,8 +252,8 @@ class TTBot extends Api {
     
     
     protected function initSessionByChatmemberUpdateObject($chat_member_update) {
-        $from = $message->getFrom();
-        $chat = $message->getChat();
+        $from = $chat_member_update->getFrom();
+        $chat = $chat_member_update->getChat();
         $this->session = new TTSession($from, $chat);   
         
         //TODO - Сделать добавление истории по этому событию
