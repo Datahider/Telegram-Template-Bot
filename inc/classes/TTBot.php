@@ -211,10 +211,10 @@ class TTBot extends Api {
         try {
             $this->initSessionByMessage($update);
             $this->initSessionByCallbackQuery($update);
+            $this->initSessionByEditedMessage($update);
+            $this->initSessionByChannelPost($update);
+            $this->initSessionByEditedChannelPost($update);
             // TODO - 
-            // $this->initSessionByEditedMessage($update)
-            // $this->initSessionByChannelPost($update)
-            // $this->initSessionByEditedChannelPost($update)
             // $this->initSessionByInlineQuery($update)
             // $this->initSessionByChosenInlineResult($update)
             // $this->initSessionByShippingQuery($update)
@@ -232,10 +232,7 @@ class TTBot extends Api {
         }
     }
 
-    protected function initSessionByMessage($update) {
-        $message = $update->get('message');
-        if (!$message) { return; }
-
+    protected function initSessionByMessageObject($message) {
         $from = $message->getFrom();
         $chat = $message->getChat();
         $this->session = new TTSession($from, $chat);   
@@ -249,6 +246,34 @@ class TTBot extends Api {
             $this->session->set('current_history_is_text', false, false);
         }
         throw new Exception('Session initialized');
+    }
+
+    protected function initSessionByMessage($update) {
+        $message = $update->get('message');
+        if (!$message) { return; }
+
+        $this->initSessionByMessageObject($message);
+    }
+    
+    protected function initSessionByEditedMessage($update) {
+        $message = $update->get('edited_message');
+        if (!$message) { return; }
+
+        $this->initSessionByMessageObject($message);
+    }
+    
+    protected function initSessionByChannelPost($update) {
+        $message = $update->get('channel_post');
+        if (!$message) { return; }
+
+        $this->initSessionByMessageObject($message);
+    }
+    
+    protected function initSessionByEditedChannelPost($update) {
+        $message = $update->get('edited_channel_post');
+        if (!$message) { return; }
+
+        $this->initSessionByMessageObject($message);
     }
     
     protected function initSessionByCallbackQuery($update) {
