@@ -11,10 +11,6 @@ class TTSession {
     protected $user;
     protected $chat;
     protected $data;
-    
-    protected $user_id;
-    protected $chat_id;
-
 
     public function __construct($user, $chat) {
         $this->user = $user;
@@ -24,14 +20,15 @@ class TTSession {
     }
     
     protected function loadSession() {
-        $this->chat_id = $this->chat->getId();
-        $this->user_id = -1;
+        $this->data['chat_id'] = $this->chat->getId();
+        $this->data['user_id'] = -1;
         
         if ($this->user) {
-            $this->user_id = $this->user->getId();
+            $this->data['user_id'] = $this->user->getId();
         }
         
-        $this->data = [];
+        $this->data['user'] = $this->user;
+        $this->data['chat'] = $this->chat;
         
         foreach ($this->sqlGetSessionData() as $param) {
             $value = unserialize($param['param_value']);
@@ -61,26 +58,19 @@ class TTSession {
     public function get($param_name, $default=null) {
         global $config;
         
-        switch ($param_name) {
-            case 'user':
-                return $this->user;
-            case 'chat':
-                return $this->chat;
-            case 'user_id':
-                return $this->user_id;
-            case 'chat_id':
-                return $this->chat_id;
-            default:
-                if (isset($config->session_static[$param_name])) {
-                    return $config->session_static[$param_name];
-                }
-                if (isset($this->data[$param_name])) {
-                    return $this->data[$param_name];
-                }
-                return $default;
+        if (isset($config->session_static[$param_name])) {
+            return $config->session_static[$param_name];
         }
+        if (isset($this->data[$param_name])) {
+            return $this->data[$param_name];
+        }
+        return $default;
     }
     
+    public function getData() {
+        return $this->data;
+    }
+
     public function set($param_name, $param_value, $persistent=true) {
         switch ($param_name) {
             case 'user':
