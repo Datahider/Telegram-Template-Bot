@@ -37,6 +37,27 @@ class TTBot extends Api {
     }
 
     public function processUpdate($update) {
+
+        if ($this->commandProcessed()) {
+            return;
+        }
+        
+        if ($menu_class = $this->session->get(AbstractMenuMember::TOP_MENU_CLASS, false)) {
+            $menu = new $menu_class();
+            $menu->bindApi($this);
+
+            switch ($menu->handle($update)) {
+                case AbstractMenuMember::HANDLE_RESULT_NOT_MINE:
+                    $this->session->set(AbstractMenuMember::TOP_MENU_CLASS, false);
+                    break;
+                case AbstractMenuMember::HANDLE_RESULT_FINISHED:
+                    $this->session->set(AbstractMenuMember::TOP_MENU_CLASS, false);
+                case AbstractMenuMember::HANDLE_RESULT_PROGRESS:
+                    return;
+                default:    
+                    throw new Exception("Unknown menu handling result");
+            }
+        }
         
         $message = $update->getMessage();
         
@@ -293,6 +314,10 @@ class TTBot extends Api {
         $this->post('answerCallbackQuery', $params);
     }
     
+    public function editMessageReplyMarkup($params) {
+        $this->post('editMessageReplyMarkup', $params);
+    }
+    
     public function editMessageText($params) {
         $this->post('editMessageText', $params);
     }
@@ -314,7 +339,7 @@ class TTBot extends Api {
     }   
     
 
-    protected function answer($text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
+    public function answer($text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
         $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
         $this->sendMessage($params);
     }
@@ -335,7 +360,7 @@ class TTBot extends Api {
         $this->edit($message_id, $text, '', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
-    protected function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
+    public function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
         $params = $this->prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
         $this->editMessageText($params);
     }

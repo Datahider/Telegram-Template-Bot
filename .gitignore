@@ -6,3 +6,7 @@
 /inc/classes/GetCommand.php
 /inc/classes/UnsetCommand.php
 /tpl/select.php
+/test.php
+/inc/classes/SetupCommand.php
+/inc/classes/SetupMenu.php
+/inc/classes/UserInput.php
