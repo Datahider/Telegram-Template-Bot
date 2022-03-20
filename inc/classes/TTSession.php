@@ -48,8 +48,8 @@ class TTSession {
         ); 
                 
         $sth->execute([
-            'chat_id' => $this->chat_id,
-            'user_id' => $this->user_id
+            'chat_id' => $this->data['chat_id'],
+            'user_id' => $this->data['user_id']
         ]);
         
         return $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -108,8 +108,8 @@ class TTSession {
         );
                 
         $sth->execute([
-            'chat_id' => $this->chat_id,
-            'user_id' => $this->user_id,
+            'chat_id' => $this->data['chat_id'],
+            'user_id' => $this->data['user_id'],
             'param_name' => $param_name,
             'param_value' => serialize($param_value)
         ]);
