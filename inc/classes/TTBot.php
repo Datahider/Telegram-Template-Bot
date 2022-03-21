@@ -14,6 +14,10 @@
 use Telegram\Bot\Api; 
 
 class TTBot extends Api {
+    
+    // Telegram API exceptions
+    const TGEX_SAME_MESSAGE = 'Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message';
+    
     protected $session;
     protected $update;
     protected $command_processed = false;
@@ -368,11 +372,27 @@ class TTBot extends Api {
     }
     
     public function editMessageReplyMarkup($params) {
-        $this->post('editMessageReplyMarkup', $params);
+        try {
+            $this->post('editMessageReplyMarkup', $params);
+        } catch (Exception $e) {
+            if ($e->getMessage() == self::TGEX_SAME_MESSAGE) {
+                error_log($e->getMessage());
+            } else {
+                throw $e;
+            }
+        }
     }
     
     public function editMessageText($params) {
-        $this->post('editMessageText', $params);
+        try {
+            $this->post('editMessageText', $params);
+        } catch (Exception $e) {
+            if ($e->getMessage() == self::TGEX_SAME_MESSAGE) {
+                error_log($e->getMessage());
+            } else {
+                throw $e;
+            }
+        }
     }
     
     public function answerHTML($text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {

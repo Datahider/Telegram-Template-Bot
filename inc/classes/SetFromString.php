@@ -27,12 +27,14 @@ class SetFromString extends AbstractMenuMember {
     protected $session_param;
     protected $regex;
     protected $type;
+    protected $return_value;
 
 
-    public function __construct($session_param, $regex=self::REGEX_TYPE_ANY, $type= self::TYPE_ANY) {
+    public function __construct($session_param, $regex=self::REGEX_TYPE_ANY, $type= self::TYPE_ANY, $return_value= AbstractMenuMember::HANDLE_RESULT_FINISHED) {
         $this->session_param = $session_param;
         $this->regex = $regex;
         $this->type = $type;
+        $this->return_value = $return_value;
     }
     
     public function value() {
@@ -61,7 +63,7 @@ class SetFromString extends AbstractMenuMember {
                     throw new Exception("Unknown value type");
             }
             $this->hideMessageButtons();
-            return AbstractMenuMember::HANDLE_RESULT_FINISHED;
+            return $this->return_value;
         } 
         throw new TTException("Input format mismatch");
     }

@@ -66,7 +66,11 @@ class UserMenu extends AbstractMenuMember {
 
         $set_from_string = $this->getSetFromString();
         if ($set_from_string) {
-            return $set_from_string->set($text);
+            $result = $set_from_string->set($text);
+            if ($result == AbstractMenuMember::HANDLE_RESULT_PROGRESS) {
+                $this->show();
+            }
+            return $result;
         } else {
             throw new TTException('No SetFromString option found');
         }
@@ -100,12 +104,19 @@ class UserMenu extends AbstractMenuMember {
                 $this->answerCallback();
                 return AbstractMenuMember::HANDLE_RESULT_PROGRESS;
             } elseif (($option->value() == $data) && is_a($option, 'SetValue')) {
-                $option->set();
+                $result = $option->set();
+                if ($result == AbstractMenuMember::HANDLE_RESULT_PROGRESS) {
+                    $this->show();
+                }
                 $this->answerCallback();
-                return AbstractMenuMember::HANDLE_RESULT_FINISHED;
+                return $result;
             } elseif (($option->value() == $data) && is_a($option, 'AbstractAction')) {
+                $result = $option->run();
+                if ($result == AbstractMenuMember::HANDLE_RESULT_PROGRESS) {
+                    $this->show();
+                }
                 $this->answerCallback();
-                return $option->run();
+                return $result;
             }
         }
         

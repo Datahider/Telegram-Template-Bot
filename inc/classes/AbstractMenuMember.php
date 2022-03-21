@@ -12,6 +12,8 @@
 abstract class AbstractMenuMember {
     const TOP_MENU_CLASS = 'AbstractMenuMember::top_menu_class';
     const CURRENT_MENU_NAME = 'AbstractMenuMember::current_menu_name';
+    const CONTEXT = self::TOP_MENU_CLASS;
+    const ITEM = self::CURRENT_MENU_NAME;
     
     const CALLBACK_MESSAGE_ID = 'AbstractMenuMember::callback_message_id';
     const LAST_CALLBACK_ID = 'AbstractMenuMember::last_callback_id';
