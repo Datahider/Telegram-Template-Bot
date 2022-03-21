@@ -42,47 +42,45 @@ class UserMenu extends AbstractMenuMember {
         try {
             $this->checkApi();
             if ($this->api->session()->get(AbstractMenuMember::CURRENT_MENU_NAME, false) == $this->name) {
-                return $this->handleSelf($update);
+                $this->handleSelf($update);
             } else {
-                return $this->handleOptions($update);
+                $this->handleOptions($update);
             }
         } catch (Exception $e) {
+            if ($this->isNormalFlow($e)) {
+                $this->answerCallback();
+                if ($e->getMessage() == AbstractMenuMember::HANDLE_RESULT_PROGRESS 
+                        && $this->api->session()->get(AbstractMenuMember::CURRENT_MENU_NAME, false) == $this->name) {
+                    $this->show();
+                } elseif ($e->getMessage() == AbstractMenuMember::HANDLE_RESULT_FINISHED) {
+                    if ($e->getCode() > 0) {
+                        throw new TTException($e->getMessage(), $e->getCode()-1);
+                    } else {
+                        $this->show();
+                        throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
+                    }
+                }
+                throw $e;
+            }
             $this->exceptionHandler($e);
         }
     }
     
     protected function handleSelf($update) {
         if ($message = $update->getMessage()) {
-            return $this->handleMessage($message);
+            $this->handleMessage($message);
         } elseif ($callback = $update->get('callback_query')) {
-            return $this->handleCallback($callback);
+            $this->handleCallback($callback);
         } else {
             throw new TTException("Can't handle non message or callback update");
         }
     }
     
     protected function handleMessage($message) {
-        $text = $message->getText();
-
-        $set_from_string = $this->getSetFromString();
-        if ($set_from_string) {
-            $result = $set_from_string->set($text);
-            if ($result == AbstractMenuMember::HANDLE_RESULT_PROGRESS) {
-                $this->show();
-            }
-            return $result;
-        } else {
-            throw new TTException('No SetFromString option found');
-        }
-    }
-    
-    protected function getSetFromString() {
         foreach ($this->options as $option) {
-            if (is_a($option, 'SetFromString')) {
-                return $option;
-            }
-        } 
-        return false;
+            if (!is_a($option, 'AbstractMessageHandler')) { continue; }
+            $option->handle($message);
+        }
     }
     
     protected function setCallbackData($callback) {
@@ -102,25 +100,13 @@ class UserMenu extends AbstractMenuMember {
             if (($option->value() == $data) && is_a($option, 'UserMenu')) {
                 $option->show();
                 $this->answerCallback();
-                return AbstractMenuMember::HANDLE_RESULT_PROGRESS;
+                throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
             } elseif (($option->value() == $data) && is_a($option, 'SetValue')) {
-                $result = $option->set();
-                if ($result == AbstractMenuMember::HANDLE_RESULT_PROGRESS) {
-                    $this->show();
-                }
-                $this->answerCallback();
-                return $result;
+                $option->set();
             } elseif (($option->value() == $data) && is_a($option, 'AbstractAction')) {
-                $result = $option->run();
-                if ($result == AbstractMenuMember::HANDLE_RESULT_PROGRESS) {
-                    $this->show();
-                }
-                $this->answerCallback();
-                return $result;
+                $option->run();
             }
         }
-        
-        return AbstractMenuMember::HANDLE_RESULT_NOT_MINE;
     }
 
     protected function answerCallback() {
@@ -130,22 +116,12 @@ class UserMenu extends AbstractMenuMember {
             $this->api->session()->set(AbstractMenuMember::LAST_CALLBACK_ID, 0);
         }
     }
+
     protected function handleOptions($update) {
         foreach ($this->options as $option) {
             if (!is_a($option, 'UserMenu')) { continue; }
-            $result = $option->handle($update);
-            switch ($result) {
-                case AbstractMenuMember::HANDLE_RESULT_NOT_MINE:
-                    break;
-                case AbstractMenuMember::HANDLE_RESULT_FINISHED:
-                    $this->show();
-                case AbstractMenuMember::HANDLE_RESULT_PROGRESS:    
-                    return AbstractMenuMember::HANDLE_RESULT_PROGRESS;
-                default:
-                    return $result - 1;
-            }
+            $option->handle($update);
         }
-        return AbstractMenuMember::HANDLE_RESULT_NOT_MINE;
     }
     
     protected function prepareKeyboard() {
@@ -172,23 +148,23 @@ class UserMenu extends AbstractMenuMember {
     
     protected function exceptionHandler($e) {
         global $config;
-        if (is_a($e, 'TTException')) {
-            // use translations from $config
-            $menu_name = $this->api->session()->get(AbstractMenuMember::CURRENT_MENU_NAME);
-            $message = $e->getMessage();
-            if (!empty($config->ttexceptions[$menu_name])) {
-                $translations = $config->ttexceptions[$menu_name];
-                if (empty($translations[$message])) {
-                    $translations = $config->ttexceptions['common'];
-                }
-            } else {
+        if (!is_a($e, 'TTException')) {
+            throw $e;
+        }
+
+        // use translations from $config
+        $menu_name = $this->api->session()->get(AbstractMenuMember::CURRENT_MENU_NAME);
+        $message = $e->getMessage();
+        if (!empty($config->ttexceptions[$menu_name])) {
+            $translations = $config->ttexceptions[$menu_name];
+            if (empty($translations[$message])) {
                 $translations = $config->ttexceptions['common'];
             }
-            if (!empty($translations[$message])) {
-                $this->api->answer($translations[$message], $this->parse_mode, null, true, []);
-            } else {
-                throw $e;
-            }
+        } else {
+            $translations = $config->ttexceptions['common'];
+        }
+        if (!empty($translations[$message])) {
+            $this->api->answer($translations[$message], $this->parse_mode, null, true, []);
         } else {
             throw $e;
         }

@@ -112,7 +112,7 @@ class MenuCalendar extends UserMenu {
     
     public function handle($update) {
         $this->makeOptions();
-        return parent::handle($update);
+        parent::handle($update);
     }
     
     protected function selectedDateAsText() {

@@ -13,6 +13,6 @@
 class ActionDoNothing extends AbstractAction {
     //put your code here
     public function run() {
-        return AbstractMenuMember::HANDLE_RESULT_PROGRESS;
+        throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
     }
 }

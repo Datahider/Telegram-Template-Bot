@@ -10,7 +10,7 @@
  *
  * @author drweb
  */
-class SetFromString extends AbstractMenuMember {
+class SetFromString extends AbstractMessageHandler {
     
     const TYPE_ANY = -1;
     const TYPE_BOOL = 0;
@@ -27,14 +27,14 @@ class SetFromString extends AbstractMenuMember {
     protected $session_param;
     protected $regex;
     protected $type;
-    protected $return_value;
+    protected $finish_processing;
 
 
-    public function __construct($session_param, $regex=self::REGEX_TYPE_ANY, $type= self::TYPE_ANY, $return_value= AbstractMenuMember::HANDLE_RESULT_FINISHED) {
+    public function __construct($session_param, $regex=self::REGEX_TYPE_ANY, $type= self::TYPE_ANY, $finish_processing=true) {
         $this->session_param = $session_param;
         $this->regex = $regex;
         $this->type = $type;
-        $this->return_value = $return_value;
+        $this->finish_processing = $finish_processing;
     }
     
     public function value() {
@@ -63,7 +63,11 @@ class SetFromString extends AbstractMenuMember {
                     throw new Exception("Unknown value type");
             }
             $this->hideMessageButtons();
-            return $this->return_value;
+            if ($this->finish_processing) {
+                throw new TTException(AbstractMenuMember::HANDLE_RESULT_FINISHED);
+            } else {
+                throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
+            }
         } 
         throw new TTException("Input format mismatch");
     }
@@ -89,4 +93,11 @@ class SetFromString extends AbstractMenuMember {
             return $text;
         }
     }
+
+    public function handle($message) {
+        if ($text = $message->get('text')) {
+            $this->set($text);
+        }
+    }
+
 }

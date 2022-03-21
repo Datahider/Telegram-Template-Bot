@@ -13,9 +13,9 @@
 class GoBack extends AbstractAction {
     public function run() {
         if ($this->value === null) {
-            return AbstractMenuMember::HANDLE_RESULT_FINISHED;
+            throw new TTException(AbstractMenuMember::HANDLE_RESULT_FINISHED);
         } else {
-            return $this->value;
+            throw new TTException(AbstractMenuMember::HANDLE_RESULT_FINISHED, $this->value);
         }
     }
 }

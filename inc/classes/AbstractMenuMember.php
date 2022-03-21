@@ -19,8 +19,8 @@ abstract class AbstractMenuMember {
     const LAST_CALLBACK_ID = 'AbstractMenuMember::last_callback_id';
     
     const HANDLE_RESULT_NOT_MINE = -1;
-    const HANDLE_RESULT_PROGRESS = 0;
-    const HANDLE_RESULT_FINISHED = 1;
+    const HANDLE_RESULT_PROGRESS = 'IN PROGRESS';
+    const HANDLE_RESULT_FINISHED = 'FINISHED';
     const HANDLE_RESULT_FINISHED_1 = 1;
     const HANDLE_RESULT_FINISHED_2 = 2;
     const HANDLE_RESULT_FINISHED_3 = 3;
@@ -64,5 +64,19 @@ abstract class AbstractMenuMember {
             ]);
             $this->api->session()->set(self::CALLBACK_MESSAGE_ID, 0);
         }
+    }
+    
+    protected function isNormalFlow(Exception $e) {
+        if (!is_a($e, 'TTException')) {
+            return false;
+        }
+        
+        if (array_search($e->getMessage(), [
+            AbstractMenuMember::HANDLE_RESULT_FINISHED,
+            AbstractMenuMember::HANDLE_RESULT_PROGRESS
+        ]) === false) {
+            return false;
+        }
+        return true;
     }
 }

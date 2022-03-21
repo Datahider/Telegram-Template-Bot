@@ -13,13 +13,13 @@
 class SetValue extends AbstractMenuMember {
     protected $value;
     protected $session_param;
-    protected $return_value;
+    protected $finish_processing;
 
-    public function __construct(string $representation, string $session_param, $value, $return_value= AbstractMenuMember::HANDLE_RESULT_FINISHED) {
+    public function __construct(string $representation, string $session_param, $value, $finish_processing=true) {
         $this->representation = $representation;
         $this->session_param = $session_param;
         $this->value = $value;
-        $this->return_value = $return_value;
+        $this->finish_processing = $finish_processing;
     }
     
     public function value() {
@@ -28,7 +28,11 @@ class SetValue extends AbstractMenuMember {
     
     public function set() {
         $this->api->session()->set($this->session_param, $this->value);
-        return $this->return_value;
+        if ($this->finish_processing) {
+            throw new TTException(AbstractMenuMember::HANDLE_RESULT_FINISHED);
+        } else {
+            throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
+        }
     }
     
 }

@@ -22,6 +22,6 @@ class ActionCalendarNextMonth extends AbstractAction {
         } else {
             $this->api->session()->set(MenuCalendar::SELECTED_MONTH, $selected_month+1);
         }
-        return AbstractMenuMember::HANDLE_RESULT_PROGRESS;
+        throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
     }
 }

@@ -49,17 +49,15 @@ class TTBot extends Api {
         if ($menu_class = $this->session->get(AbstractMenuMember::TOP_MENU_CLASS, false)) {
             $menu = new $menu_class();
             $menu->bindApi($this);
-
-            switch ($menu->handle($update)) {
-                case AbstractMenuMember::HANDLE_RESULT_NOT_MINE:
+            
+            try {
+                $menu->handle($update);
+                $this->session->set(AbstractMenuMember::TOP_MENU_CLASS, false);
+            } catch (Exception $e) {
+                if ($e->getMessage() == AbstractMenuMember::HANDLE_RESULT_FINISHED) {
                     $this->session->set(AbstractMenuMember::TOP_MENU_CLASS, false);
-                    break;
-                case AbstractMenuMember::HANDLE_RESULT_FINISHED:
-                    $this->session->set(AbstractMenuMember::TOP_MENU_CLASS, false);
-                case AbstractMenuMember::HANDLE_RESULT_PROGRESS:
-                    return;
-                default:    
-                    throw new Exception("Unknown menu handling result");
+                }
+                return;
             }
         }
         

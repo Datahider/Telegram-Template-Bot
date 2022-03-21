@@ -6,12 +6,16 @@
  */
 
 /**
- * Description of TTException
+ * Description of AbstractMessageHandler
  *
  * @author drweb
  */
-class TTException extends Exception {
-    public function __construct(string $message = "", int $code = 1, \Throwable $previous = null) {
-        parent::__construct($message, $code, $previous);
+abstract class AbstractMessageHandler extends AbstractMenuMember {
+    
+    public function value() {
+        return null;
     }
+    
+    abstract public function handle($message); 
+
 }

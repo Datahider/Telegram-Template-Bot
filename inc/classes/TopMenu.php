@@ -15,4 +15,5 @@ class TopMenu extends UserMenu {
         $this->api->session()->set(AbstractMenuMember::TOP_MENU_CLASS, get_class($this));
         parent::show();
     }
+    
 }

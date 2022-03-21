@@ -14,6 +14,6 @@ class ActionCalendarDay extends AbstractAction {
     //put your code here
     public function run() {
         $this->api->session()->set(MenuCalendar::SELECTED_DAY, $this->value);
-        return AbstractMenuMember::HANDLE_RESULT_PROGRESS;
+        throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
     }
 }
