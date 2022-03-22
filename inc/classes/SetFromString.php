@@ -95,7 +95,8 @@ class SetFromString extends AbstractMessageHandler {
     }
 
     public function handle($message) {
-        if ($text = $message->get('text')) {
+        $text = $message->get('text');
+        if (isset($text)) {
             $this->set($text);
         }
     }

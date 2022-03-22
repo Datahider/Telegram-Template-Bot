@@ -17,7 +17,7 @@ class MenuCalendar extends UserMenu {
     const SELECTED_HOUR = 'MenuCalendar::selected_hour';
     const STARTING_HOUR = 'MenuCalendar::starting_hour';
     
-    const REGEX_TIME = "/^(\d\d?)(\:?)(\d\d)$/";
+    const REGEX_TIME = "/^([01]?\d|2[0-3])(\:?)(\d\d)?$/";
     
     const JAN = 'Январь';
     const FEB = 'Февраль';
@@ -32,22 +32,17 @@ class MenuCalendar extends UserMenu {
     const NOV = 'Ноябрь';
     const DEC = 'Декабрь';
     
-    protected $input_time_text;
-    protected $input_date_text;
     protected $session_param;
 
 
-    public function __construct(string $name, string $representation, string $text, string $input_time_text, string $session_param) {
+    public function __construct(string $name, string $representation, string $text, string $session_param) {
         
         parent::__construct($name, $representation, $text, []);
-        $this->input_time_text = $input_time_text;
-        $this->input_date_text = $text;
         $this->session_param = $session_param;
     }
     
-    protected function makeOptionsCalendar() {
+    protected function makeOptions() {
         $header = $this->selectedMonthYearAsText();
-        $this->text = $this->input_date_text;
         
         $this->options = [
             new SetFromString(self::SELECTED_HOUR, self::REGEX_TIME),
@@ -55,7 +50,7 @@ class MenuCalendar extends UserMenu {
             new LineSeparator(),
             new ActionCalendarPrevYear('prev_year', "««"),
             new ActionCalendarPrevMonth('prev_month', "«"),
-            new ActionCalendarNow('now', "Тек."),
+            new ActionCalendarNow('now', "Тек.", $this),
             new ActionCalendarNextMonth('next_month', "»"),
             new ActionCalendarNextYear('next_year', "»»"),
             new LineSeparator(),
@@ -90,7 +85,9 @@ class MenuCalendar extends UserMenu {
             }
         }
         $this->options[] = new LineSeparator();
-        $this->options[] = new GoBack('go_back', 'Отмена');
+        $this->options[] = new GoBack('go_back', 'Отмена', 2);
+
+        $this->bindApi($this->api);
     }
 
     protected function dayDisplay($day) {
@@ -116,26 +113,12 @@ class MenuCalendar extends UserMenu {
         return $day;
     }
     
-    protected function makeOptionsHours() {
-        $header = $this->selectedDateAsText();
-        $this->text = $this->input_time_text;
-        
-        $this->options = [
-            new ActionCalendarBackToDate('selected_date', "« $header"),
-            new SetFromString(MenuCalendar::SELECTED_HOUR, self::REGEX_TIME)
-        ];    
-    }
-    
-    protected function makeOptionsMinutes() {
-        
-    }
-    
-    protected function makeOptions() {
-        $this->makeOptionsCalendar();
-        $this->bindApi($this->api);
-    }
-
     public function show() {
+        if (!$this->api->session()->get(self::SELECTED_YEAR, false)) {
+            $selected_date = $this->api->session()->get($this->session_param, false);
+            $this->setDate($selected_date);
+        }
+        
         $this->makeOptions();
         parent::show();
     }
@@ -146,7 +129,11 @@ class MenuCalendar extends UserMenu {
             parent::handle($update);
         } catch (Exception $e) {
             if ($this->isFinished($e)) {
-                $this->setSessionParam();
+                if ($e->getCode() == 0) {
+                    $this->setSessionParam();
+                } else {
+                    $e = new TTException($e->getMessage(), $e->getCode()-1);
+                }
                 $this->cleanup();
             }
             throw $e;
@@ -180,16 +167,20 @@ class MenuCalendar extends UserMenu {
         return "$day $noday";
     }
     
+    public function setDate($date=null) {
+        $time = time();
+
+        if ($date) {
+            $datetime = new DateTime($date);
+            $time = $datetime->format('U');
+        }
+
+        $this->setYear(localtime($time, true)['tm_year']+1900);
+        $this->setMonth(localtime($time, true)['tm_mon']+1);
+        $this->setDay(localtime($time, true)['tm_mday']);
+    }
+    
     protected function selectedMonthYearAsText() {
-        if (!$this->api->session()->get(self::SELECTED_YEAR, false)) {
-            $this->setYear(localtime(time(), true)['tm_year']+1900);
-        }
-        if (!$this->api->session()->get(self::SELECTED_MONTH, false)) {
-            $this->setMonth(localtime(time(), true)['tm_mon']+1);
-        }
-        if (!$this->api->session()->get(self::SELECTED_DAY, false)) {
-            $this->setDay(localtime(time(), true)['tm_mday']);
-        }
         $year = $this->api->session()->get(self::SELECTED_YEAR);
         $month = $this->api->session()->get(self::SELECTED_MONTH);
         $month_name = ['', self::JAN, self::FEB, self::MAR, self::APR, self::MAY, self::JUN, self::JUL, self::AUG, self::SEP, self::OCT, self::NOV, self::DEC][$month];
@@ -227,7 +218,7 @@ class MenuCalendar extends UserMenu {
     
     protected function exceptionHandler($e) {
         if ($this->isTTException($e) && $e->getMessage() == 'Input format mismatch') {
-            $this->api->answerHTML('Введите время в формате ЧЧ:MM или ЧЧММ');
+            $this->api->answerHTML('Введите время в формате <b>Ч:MM</b>, <b>ЧММ</b> или <b>Ч</b>');
             throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
         }
         parent::exceptionHandler($e);
