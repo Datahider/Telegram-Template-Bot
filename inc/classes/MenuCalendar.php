@@ -236,7 +236,6 @@ class MenuCalendar extends UserMenu {
     protected function isCurrent($year, $month, $day) {
         $tm = localtime(time(), true);
         $result = (($tm['tm_year']+1900 == $year) && ($tm['tm_mon']+1 == $month) && ($tm['tm_mday'] == $day));
-        error_log("$tm[tm_year] $year $tm[tm_mon] $month $tm[tm_mday] $day $result");
         return $result;
     }
 }
