@@ -128,7 +128,7 @@ class UserMenu extends AbstractMenuMember {
         $rows = [];
         $buttons = [];
         foreach ($this->options as $option) {
-            if (is_a($option, 'SetFromString')) { continue; }
+            if (is_a($option, 'AbstractMessageHandler')) { continue; }
             if (!is_a($option, 'AbstractMenuMember')) {
                 throw new TTException('$options must be an array of instances of AbstractMenuMember descendants');
             } elseif (is_a($option, 'LineSeparator')) {
