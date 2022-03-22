@@ -13,7 +13,7 @@
 class ActionCalendarPrevMonth extends AbstractAction {
     //put your code here
     public function run() {
-        $$selected_month = $this->api->session()->get(MenuCalendar::SELECTED_MONTH, 1);
+        $selected_month = $this->api->session()->get(MenuCalendar::SELECTED_MONTH, 1);
         
         if ($selected_month == 1) {
             $this->api->session()->set(MenuCalendar::SELECTED_MONTH, 12);

@@ -17,6 +17,8 @@ class MenuCalendar extends UserMenu {
     const SELECTED_HOUR = 'MenuCalendar::selected_hour';
     const STARTING_HOUR = 'MenuCalendar::starting_hour';
     
+    const REGEX_TIME = "/^(\d\d?)(\:?)(\d\d)$/";
+    
     const JAN = 'Январь';
     const FEB = 'Февраль';
     const MAR = 'Март';
@@ -32,6 +34,7 @@ class MenuCalendar extends UserMenu {
     
     protected $input_time_text;
     protected $input_date_text;
+    protected $session_param;
 
 
     public function __construct(string $name, string $representation, string $text, string $input_time_text, string $session_param) {
@@ -39,6 +42,7 @@ class MenuCalendar extends UserMenu {
         parent::__construct($name, $representation, $text, []);
         $this->input_time_text = $input_time_text;
         $this->input_date_text = $text;
+        $this->session_param = $session_param;
     }
     
     protected function makeOptionsCalendar() {
@@ -46,7 +50,7 @@ class MenuCalendar extends UserMenu {
         $this->text = $this->input_date_text;
         
         $this->options = [
-            new SetFromString(self::SELECTED_YEAR, "/^\d{4}$/"),
+            new SetFromString(self::SELECTED_HOUR, self::REGEX_TIME),
             new ActionDoNothing('cur_month', $header),
             new LineSeparator(),
             new ActionCalendarPrevYear('prev_year', "««"),
@@ -64,7 +68,12 @@ class MenuCalendar extends UserMenu {
             new ActionDoNothing('sun', 'вс'),
         ];
         
-        $loop_data = $this->monthLoopData($this->api->session()->get(self::SELECTED_MONTH), $this->api->session()->get(self::SELECTED_YEAR));
+        $month = $this->api->session()->get(self::SELECTED_MONTH);
+        $year = $this->api->session()->get(self::SELECTED_YEAR);
+        
+        $loop_data = $this->monthLoopData($month, $year);
+        $day = $this->correctDay($loop_data['days']);
+        
         $count = 0;
         for( $i = $loop_data['loopstart']; $i <= $loop_data['loopstop']; $i++) {
             if ($count == 0) {
@@ -73,22 +82,47 @@ class MenuCalendar extends UserMenu {
             if (($i <= 0) || ($i > $loop_data['days'])) {
                 $this->options[] = new ActionDoNothing("empty$i", ' ');
             } else {
-                $this->options[] = new ActionCalendarDay("day$i", $i, $i);
+                $this->options[] = new ActionCalendarDay("day$i", $this->dayDisplay($i), $i);
             }
             $count++;
             if ($count == 7) {
                 $count = 0;
             }
         }
+        $this->options[] = new LineSeparator();
+        $this->options[] = new GoBack('go_back', 'Отмена');
     }
 
+    protected function dayDisplay($day) {
+        $selected_day = $this->api->session()->get(self::SELECTED_DAY);
+        $selected_month = $this->api->session()->get(self::SELECTED_MONTH);
+        $selected_year = $this->api->session()->get(self::SELECTED_YEAR);
+        
+        //🔆☀️🔅
+        if ($day == $selected_day) {
+            return $this->isCurrent($selected_year, $selected_month, $selected_day) ? '☀' : '🔸';
+        } else {
+            return $this->isCurrent($selected_year, $selected_month, $day) ? '️🔅' : "$day";
+        }
+        return "$day";
+    }
+    
+    protected function correctDay($max_day) {
+        $day = $this->api->session()->get(self::SELECTED_DAY);
+        if ($day > $max_day) {
+            $day = $max_day;
+            $this->api->session()->set(self::SELECTED_DAY, $day);
+        }
+        return $day;
+    }
+    
     protected function makeOptionsHours() {
         $header = $this->selectedDateAsText();
         $this->text = $this->input_time_text;
         
         $this->options = [
             new ActionCalendarBackToDate('selected_date', "« $header"),
-            new SetFromString(MenuCalendar::SELECTED_HOUR, "/^\d\d?\:?\d\d$/")
+            new SetFromString(MenuCalendar::SELECTED_HOUR, self::REGEX_TIME)
         ];    
     }
     
@@ -97,11 +131,7 @@ class MenuCalendar extends UserMenu {
     }
     
     protected function makeOptions() {
-        if ($this->api->session()->get(self::SELECTED_DAY, false)) {
-            $this->makeOptionsHours();
-        } else {
-            $this->makeOptionsCalendar();
-        }
+        $this->makeOptionsCalendar();
         $this->bindApi($this->api);
     }
 
@@ -112,9 +142,37 @@ class MenuCalendar extends UserMenu {
     
     public function handle($update) {
         $this->makeOptions();
-        parent::handle($update);
+        try {
+            parent::handle($update);
+        } catch (Exception $e) {
+            if ($this->isFinished($e)) {
+                $this->setSessionParam();
+                $this->cleanup();
+            }
+            throw $e;
+        }
     }
     
+    protected function cleanup() {
+        $this->api->session()->setParams([
+            self::SELECTED_YEAR, 
+            self::SELECTED_MONTH,
+            self::SELECTED_DAY,
+            self::SELECTED_HOUR
+        ], false);
+    }
+    
+    protected function setSessionParam() {
+        $year = $this->api->session()->get(self::SELECTED_YEAR);
+        $month = $this->api->session()->get(self::SELECTED_MONTH);
+        $day = $this->api->session()->get(self::SELECTED_DAY);
+        
+        preg_match(self::REGEX_TIME, $this->api->session()->get(self::SELECTED_HOUR), $matches);
+        
+        $date = sprintf("%04u-%02u-%02u %02u:%02u:00", $year, $month, $day, $matches[1], $matches[3]);
+        
+        $this->api->session()->set($this->session_param, $date);
+    }
     protected function selectedDateAsText() {
         $noday = $this->selectedMonthYearAsText();
         $day = $this->api->session()->get(self::SELECTED_DAY, 1);
@@ -129,6 +187,9 @@ class MenuCalendar extends UserMenu {
         if (!$this->api->session()->get(self::SELECTED_MONTH, false)) {
             $this->setMonth(localtime(time(), true)['tm_mon']+1);
         }
+        if (!$this->api->session()->get(self::SELECTED_DAY, false)) {
+            $this->setDay(localtime(time(), true)['tm_mday']);
+        }
         $year = $this->api->session()->get(self::SELECTED_YEAR);
         $month = $this->api->session()->get(self::SELECTED_MONTH);
         $month_name = ['', self::JAN, self::FEB, self::MAR, self::APR, self::MAY, self::JUN, self::JUL, self::AUG, self::SEP, self::OCT, self::NOV, self::DEC][$month];
@@ -141,6 +202,10 @@ class MenuCalendar extends UserMenu {
 
     protected function setMonth($month) {
         $this->api->session()->set(self::SELECTED_MONTH, $month);
+    }
+    
+    protected function setDay($day) {
+        $this->api->session()->set(self::SELECTED_DAY, $day);
     }
     
     protected function monthLoopData($month, $year) {
@@ -160,4 +225,18 @@ class MenuCalendar extends UserMenu {
         ];
     }
     
+    protected function exceptionHandler($e) {
+        if ($this->isTTException($e) && $e->getMessage() == 'Input format mismatch') {
+            $this->api->answerHTML('Введите время в формате ЧЧ:MM или ЧЧММ');
+            throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
+        }
+        parent::exceptionHandler($e);
+    }
+    
+    protected function isCurrent($year, $month, $day) {
+        $tm = localtime(time(), true);
+        $result = (($tm['tm_year']+1900 == $year) && ($tm['tm_mon']+1 == $month) && ($tm['tm_mday'] == $day));
+        error_log("$tm[tm_year] $year $tm[tm_mon] $month $tm[tm_mday] $day $result");
+        return $result;
+    }
 }

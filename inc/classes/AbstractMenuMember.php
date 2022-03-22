@@ -71,12 +71,26 @@ abstract class AbstractMenuMember {
             return false;
         }
         
-        if (array_search($e->getMessage(), [
-            AbstractMenuMember::HANDLE_RESULT_FINISHED,
-            AbstractMenuMember::HANDLE_RESULT_PROGRESS
-        ]) === false) {
+        return $this->isInProgress($e) || $this->isFinished($e);
+    }
+    
+    protected function isFinished(Exception $e) {
+        if (!is_a($e, 'TTException')) {
             return false;
         }
-        return true;
+
+        return ($e->getMessage() == AbstractMenuMember::HANDLE_RESULT_FINISHED); 
+    }
+    
+    protected function isInProgress(Exception $e) {
+        if (!is_a($e, 'TTException')) {
+            return false;
+        }
+
+        return ($e->getMessage() == AbstractMenuMember::HANDLE_RESULT_PROGRESS); 
+    }
+    
+    protected function isTTException($e) {
+        return is_a($e, 'TTException');
     }
 }

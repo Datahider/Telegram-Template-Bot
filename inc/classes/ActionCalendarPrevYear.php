@@ -15,5 +15,6 @@ class ActionCalendarPrevYear extends AbstractAction {
     public function run() {
         $this->api->session()->set(MenuCalendar::SELECTED_YEAR, 
                 $this->api->session()->get(MenuCalendar::SELECTED_YEAR, 1)-1);
+        throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
     }
 }

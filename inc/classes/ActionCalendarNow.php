@@ -13,7 +13,9 @@
 class ActionCalendarNow extends AbstractAction {
     //put your code here
     public function run() {
+        $this->api->session()->set(MenuCalendar::SELECTED_DAY, false);
         $this->api->session()->set(MenuCalendar::SELECTED_MONTH, false);
         $this->api->session()->set(MenuCalendar::SELECTED_YEAR, false);
+        throw new TTException(AbstractMenuMember::HANDLE_RESULT_PROGRESS);
     }
 }
