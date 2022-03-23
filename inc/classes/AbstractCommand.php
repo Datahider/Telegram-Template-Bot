@@ -16,5 +16,6 @@ abstract class AbstractCommand extends Telegram\Bot\Commands\Command {
     public function handle($arguments) {
         $this->api = $this->getTelegram();
         $this->api->session()->set(AbstractMenuMember::TOP_MENU_CLASS, false);
+        $this->api->session()->set(UserMenu::CALLBACK_MESSAGE_ID, false);
     }
 }

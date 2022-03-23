@@ -188,4 +188,14 @@ class UserMenu extends AbstractMenuMember {
     public function resetCallbackMessage() {
         $this->api->session()->set(self::CALLBACK_MESSAGE_ID, false);
     }
+    
+    /**
+     * Подготавливает объект к использованию и показывает его
+     * Делает буквально bindApi($api); show();
+     * @param type $api
+     */
+    public function bindNShow($api) {
+        $this->bindApi($api);
+        $this->show();
+    }
 }
