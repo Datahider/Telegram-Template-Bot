@@ -28,6 +28,9 @@ class UserMenu extends AbstractMenuMember {
     public function show() {
         $this->checkApi();
         $this->api->session()->set(AbstractMenuMember::CURRENT_MENU_NAME, $this->name);
+        
+        $this->api->session()->set('object', $this, false);
+        
         $keyboard = $this->prepareKeyboard();
         $message_id = $this->api->session()->get(self::CALLBACK_MESSAGE_ID, 0);
         

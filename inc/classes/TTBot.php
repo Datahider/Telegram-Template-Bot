@@ -22,6 +22,8 @@ class TTBot extends Api {
     protected $update;
     protected $command_processed = false;
     
+    public $object; 
+    
     public function isBotAdmin() {
         global $config;
         $admins = is_array($config->admin) ? $config->admin : [$config->admin];
@@ -437,6 +439,8 @@ class TTBot extends Api {
     }
     
     protected function prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
+        $this->object = $this->session->get('object', false);
+        
         $params = [
             'chat_id' => $this->session->get('chat_id'),
             'text' => $this->replaceVars($text),
