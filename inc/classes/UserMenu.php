@@ -184,4 +184,8 @@ class UserMenu extends AbstractMenuMember {
             }
         }
     }
+    
+    public function resetCallbackMessage() {
+        $this->api->session()->set(self::CALLBACK_MESSAGE_ID, false);
+    }
 }
