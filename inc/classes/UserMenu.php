@@ -194,7 +194,7 @@ class UserMenu extends AbstractMenuMember {
      * Делает буквально bindApi($api); show();
      * @param type $api
      */
-    public function bindNShow($api) {
+    public function bindNShow(TTBot $api) {
         $this->bindApi($api);
         $this->show();
     }
