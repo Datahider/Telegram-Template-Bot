@@ -11,7 +11,7 @@
  * @author drweb
  */
 class TopMenu extends UserMenu {
-    public function show(int $message_id = 0) {
+    public function show() {
         $this->api->session()->set(AbstractMenuMember::TOP_MENU_CLASS, get_class($this));
         parent::show();
     }
