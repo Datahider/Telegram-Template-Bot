@@ -10,13 +10,14 @@
  *
  * @author drweb
  */
-class AbstractMessageTextHandler extends AbstractMessageHandler {
+abstract class AbstractMessageTextHandler extends AbstractMessageHandler {
     protected $text;
     
     
     public function handle($message) {
-        $this->text = $message->get('text');
+        parent::handle($message);
         
+        $this->text = $message->get('text');
     }
 
 }

@@ -16,6 +16,8 @@ abstract class AbstractMessageHandler extends AbstractMenuMember {
         return null;
     }
     
-    abstract public function handle($message); 
+    public function handle($message) {
+        $this->api->session()->set(self::CALLBACK_MESSAGE_ID, false);
+    } 
 
 }
