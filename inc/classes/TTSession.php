@@ -80,9 +80,16 @@ class TTSession {
                 return;
         }
         
-        $this->data[$param_name] = $param_value;
-        if ($persistent) {
-            $this->sqlSetSessionParam($param_name, $param_value);
+        if ($param_value !== null) {
+            $this->data[$param_name] = $param_value;
+            if ($persistent) {
+                $this->sqlSetSessionParam($param_name, $param_value);
+            }
+        } else {
+            unset($this->data[$param_name]);
+            if ($persistent) {
+                $this->sqlUnsetSessionParam($param_name);
+            }
         }
     }
     
@@ -112,6 +119,26 @@ class TTSession {
             'user_id' => $this->data['user_id'],
             'param_name' => $param_name,
             'param_value' => serialize($param_value)
+        ]);
+    }
+    
+    public function sqlUnsetSessionParam($param_name) {
+        global $pdo, $config;
+        
+        $sth = $pdo->prepare(<<<SQL
+            DELETE FROM
+                {$config->db_prefix}sessiondata
+            WHERE
+                chat_id = :chat_id
+                AND user_id = :user_id
+                AND param_name = :param_name
+            SQL    
+        );
+
+        $sth->execute([
+            'chat_id' => $this->data['chat_id'],
+            'user_id' => $this->data['user_id'],
+            'param_name' => $param_name,
         ]);
     }
 }
