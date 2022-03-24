@@ -18,13 +18,15 @@ abstract class AbstractMenuMember {
     const CALLBACK_MESSAGE_ID = 'AbstractMenuMember::callback_message_id';
     const LAST_CALLBACK_ID = 'AbstractMenuMember::last_callback_id';
     
-    const HANDLE_RESULT_NOT_MINE = -1;
     const HANDLE_RESULT_PROGRESS = 'IN PROGRESS';
     const HANDLE_RESULT_FINISHED = 'FINISHED';
-    const HANDLE_RESULT_FINISHED_1 = 1;
-    const HANDLE_RESULT_FINISHED_2 = 2;
-    const HANDLE_RESULT_FINISHED_3 = 3;
-    
+
+    const SP_ENTITY_ID = 'AbstractMenuMember::entity_id';
+
+    const SP_INDEX_MAP = 'AbstractMenuMember::index_map';
+    const SP_INDEX_MAP_CURRENT = 'AbstractMenuMember::index_map_current';
+
+
     protected $api;
     protected $options;
     protected $representation;
