@@ -17,6 +17,11 @@ class TTBot extends Api {
     
     // Telegram API exceptions
     const TGEX_SAME_MESSAGE = 'Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message';
+    const TGEX_BLOCKED = 'Forbidden: bot was blocked by the user';
+    
+    const KNOWN_EXCEPTIONS = [
+        self::TGEX_BLOCKED, self::TGEX_SAME_MESSAGE
+    ];
     
     protected $session;
     protected $update;
@@ -375,11 +380,7 @@ class TTBot extends Api {
         try {
             $this->post('editMessageReplyMarkup', $params);
         } catch (Exception $e) {
-            if ($e->getMessage() == self::TGEX_SAME_MESSAGE) {
-                error_log($e->getMessage());
-            } else {
-                throw $e;
-            }
+            $this->exceptionHandler($e);
         }
     }
     
@@ -414,7 +415,11 @@ class TTBot extends Api {
 
     public function answer($text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
         $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
-        $this->sendMessage($params);
+        try {
+            $this->sendMessage($params);
+        } catch (Exception $e) {
+            $this->exceptionHandler($e);
+        }
     }
     
     public function editHTML($message_id, $text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
@@ -435,7 +440,11 @@ class TTBot extends Api {
     
     public function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
         $params = $this->prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
-        $this->editMessageText($params);
+        try {
+            $this->editMessageText($params);
+        } catch (Exception $e) {
+            $this->exceptionHandler($e);
+        }
     }
     
     protected function prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
@@ -489,5 +498,22 @@ class TTBot extends Api {
     
     protected function makeSession($user, $chat) {
         return new TTSession($user, $chat);
+    }
+    
+    protected function exceptionHandler($e) {
+        $message = $e->getMessage();
+        if (array_search($message, self::KNOWN_EXCEPTIONS) === false) {
+            throw $e;
+        }
+        
+        error_log($message);
+        
+        switch ($message) {
+            case self::TGEX_BLOCKED:
+                // Just an example
+                break;
+            default:
+                break;
+        }
     }
 }
