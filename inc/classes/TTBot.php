@@ -258,7 +258,7 @@ class TTBot extends Api {
     protected function initSessionByChatmemberUpdateObject($chat_member_update) {
         $from = $chat_member_update->getFrom();
         $chat = $chat_member_update->getChat();
-        $this->session = new TTSession($from, $chat);   
+        $this->session = $this->makeSession($from, $chat);   
         
         //TODO - Сделать добавление истории по этому событию
         throw new Exception('Session initialized');
@@ -267,7 +267,7 @@ class TTBot extends Api {
     protected function initSessionByMessageObject($message) {
         $from = $message->getFrom();
         $chat = $message->getChat();
-        $this->session = new TTSession($from, $chat);   
+        $this->session = $this->makeSession($from, $chat);   
         $text = $message->getText();
         
         if ($text) {
@@ -314,7 +314,7 @@ class TTBot extends Api {
 
         $from = $callback_query->getFrom();
         $chat = $callback_query->getMessage()->getChat();
-        $this->session = new TTSession($from, $chat);   
+        $this->session = $this->makeSession($from, $chat);   
         $text = 'Callback data: ' . $callback_query->get('data');
         
         $this->session->set('current_history_data', $text, false);
@@ -487,4 +487,7 @@ class TTBot extends Api {
         return $reply_markup;
     }
     
+    protected function makeSession($user, $chat) {
+        return new TTSession($user, $chat);
+    }
 }
