@@ -9,6 +9,6 @@ global $pdo;
 $pdo = new PDO("mysql:dbname=$config->db_name;host=$config->db_host", 
         $config->db_user, 
         $config->db_pass, 
-        array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'")
+        array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4'")
 );
 

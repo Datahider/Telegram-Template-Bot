@@ -3,6 +3,6 @@
         "irazasyed/telegram-bot-sdk": "^2.0"
     },
     "autoload": {
-        "psr-4": { "": "inc/classes" }
+        "psr-4": { "": ["inc/classes", "inc/classes/abstract"] }
     }    
 }
