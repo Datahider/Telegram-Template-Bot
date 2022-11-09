@@ -340,9 +340,13 @@ class TTBot extends Api {
         
     }
     
-    public function replaceVars($text) {
+    public function replaceVars($text, $ignore_templates=false) {
         if (!preg_match_all("/\{\{([^{}]+)\}\}/", $text, $matches, PREG_SET_ORDER)) {
             return $text;
+        }
+        
+        if (!$ignore_templates && file_exists($text)) {
+            $text = file_get_contents($text);
         }
         
         $count = 1;
@@ -358,7 +362,7 @@ class TTBot extends Api {
                 $text = str_replace($match[0], $this->session->get($match[1], "$match[1]"), $text, $count);
             }
         }
-        return $this->replaceVars($text);
+        return $this->replaceVars($text, true);
     }
     
     public function replaceVarsArray($array) {
