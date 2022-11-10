@@ -340,7 +340,7 @@ class TTBot extends Api {
         
     }
     
-    public function replaceVars($text, $ignore_templates=false) {
+    public function replaceVars($text) {
         if (!preg_match_all("/\{\{([^{}]+)\}\}/", $text, $matches, PREG_SET_ORDER)) {
             return $text;
         }
@@ -358,7 +358,7 @@ class TTBot extends Api {
                 $text = str_replace($match[0], $this->session->get($match[1], "$match[1]"), $text, $count);
             }
         }
-        return $this->replaceVars($text, true);
+        return $this->replaceVars($text);
     }
     
     public function replaceVarsArray($array) {
