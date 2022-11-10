@@ -345,10 +345,6 @@ class TTBot extends Api {
             return $text;
         }
         
-        if (!$ignore_templates && file_exists($text)) {
-            $text = file_get_contents($text);
-        }
-        
         $count = 1;
         foreach ( $matches as $match ) {
             if (preg_match("/^file\:(.+)$/", $match[1], $filematches)) {
