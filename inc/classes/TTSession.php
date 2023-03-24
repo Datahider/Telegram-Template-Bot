@@ -37,6 +37,18 @@ class TTSession {
             }
             $this->data[$param['param_name']] = $value;
         }
+        
+        if ( ($this->data['user_id'] != -1) ) {
+            if (!isset($this->data['call_name'])) {
+                $this->set('call_name', $this->user->getFirstName(), true);
+            }
+            if (!isset($this->data['alias'])) {
+                $alias = $this->user->getLastName() 
+                        ? $this->user->getFirstName(). ' '. $this->user->getLastName()
+                        : $this->user->getFirstName();
+                $this->set('alias', $alias, true);
+            }
+        }
     }
     
     protected function sqlGetSessionData() {

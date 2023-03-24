@@ -240,7 +240,7 @@ class TTBot extends Api {
             }
         }
     }
-
+    
     protected function initSessionByMyChatMember($update) {
         $chat_member_update = $update->get('my_chat_member');
         if (!$chat_member_update) {
@@ -350,10 +350,11 @@ class TTBot extends Api {
             if (preg_match("/^file\:(.+)$/", $match[1], $filematches)) {
                 ob_start();
                 include "tpl/$filematches[1]";
-                $text = ob_get_clean();
-                if (!$text) {
-                    $text = $match[1];
+                $replacement = ob_get_clean();
+                if (!$replacement) {
+                    $replacement = $match[1];
                 }
+                $text = str_replace($match[0], $replacement, $text, $count);
             } else {
                 $text = str_replace($match[0], $this->session->get($match[1], "$match[1]"), $text, $count);
             }
@@ -409,7 +410,7 @@ class TTBot extends Api {
     }   
     
     public function answerPlainText($text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
-        $this->answer($text, '', $keyboard, $custom_keyboard, $keyboard_params);
+        $this->answer($text, 'Plain', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
 
@@ -435,7 +436,7 @@ class TTBot extends Api {
     }   
     
     public function editPlainText($message_id, $text, $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
-        $this->edit($message_id, $text, '', $keyboard, $custom_keyboard, $keyboard_params);
+        $this->edit($message_id, $text, 'Plain', $keyboard, $custom_keyboard, $keyboard_params);
     }   
     
     public function edit($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
@@ -455,7 +456,10 @@ class TTBot extends Api {
             'text' => $this->replaceVars($text),
         ];
         
-        if ($parse_mode) {
+        if ( $parse_mode == 'Plain' ) {
+            $params['parse_mode'] = 'MarkdownV2';
+            $params['text'] = preg_replace("/([\\\_\*\[\]\(\)\~\`\>\#\+\-\=\|\{\}\.\!])/", "\\\\$1", $params['text']);
+        } elseif ( $parse_mode ) {
             $params['parse_mode'] = $parse_mode;
         }
         
