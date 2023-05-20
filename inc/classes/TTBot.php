@@ -277,10 +277,10 @@ class TTBot extends Api {
         
         if ($text) {
             $this->session->set('current_history_data', $text, false);
-            $this->session->set('current_history_is_text', true, false);
+            $this->session->set('current_history_is_text', 1, false);
         } else {
             $this->session->set('current_history_data', '--Non-text-message--', false);
-            $this->session->set('current_history_is_text', false, false);
+            $this->session->set('current_history_is_text', 0, false);
         }
         throw new Exception('Session initialized');
     }
@@ -323,7 +323,7 @@ class TTBot extends Api {
         $text = 'Callback data: ' . $callback_query->get('data');
         
         $this->session->set('current_history_data', $text, false);
-        $this->session->set('current_history_is_text', false, false);
+        $this->session->set('current_history_is_text', 0, false);
 
         throw new Exception('Session initialized');
     }
@@ -443,6 +443,22 @@ class TTBot extends Api {
         $params = $this->prepareMessageParams($message_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
         try {
             $this->editMessageText($params);
+        } catch (Exception $e) {
+            $this->exceptionHandler($e);
+        }
+    }
+    
+    public function toAdmin($text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
+        global $config;
+        $chat_id = $config->admin;
+        $this->toChat($chat_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
+    }
+    
+    public function toChat($chat_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
+        $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
+        $params['chat_id'] = $chat_id;
+        try {
+            $this->sendMessage($params);
         } catch (Exception $e) {
             $this->exceptionHandler($e);
         }
