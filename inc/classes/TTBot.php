@@ -536,4 +536,13 @@ class TTBot extends Api {
                 break;
         }
     }
+    
+    public function copyMessage(array $params)
+    {
+        $response = $this->post('copyMessage', $params);
+
+        return new Message($response->getDecodedBody());
+    }
+
+    
 }
