@@ -12,7 +12,7 @@
  */
 
 use Telegram\Bot\Api;
-use Telegram\Bot\Objects;
+use Telegram\Bot\Message;
 
 class TTBot extends Api {
     
@@ -542,7 +542,7 @@ class TTBot extends Api {
     {
         $response = $this->post('copyMessage', $params);
 
-        return new Message($response->getDecodedBody());
+        return new Telegram\Bot\Objects\Message($response->getDecodedBody());
     }
 
     
