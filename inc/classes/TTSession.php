@@ -12,13 +12,31 @@ class TTSession {
     protected $chat;
     protected $data;
 
-    public function __construct($user, $chat) {
+    public function __construct($user, $chat, $by_objects=true) {
         $this->user = $user;
         $this->chat = $chat;
         
-        $this->loadSession();
+        if ($by_objects) {
+            $this->loadSession();
+        } else {
+            $this->loadSessionByIds();
+        }
     }
     
+    protected function loadSessionByIds() {
+        $this->data['chat_id'] = $this->chat;
+        $this->data['user_id'] = $this->user;
+        
+        foreach ($this->sqlGetSessionData() as $param) {
+            $value = unserialize($param['param_value']);
+            if ($value === false && serialize($value) != $param['param_value']) {
+                $value = $param['param_value'];
+            }
+            $this->data[$param['param_name']] = $value;
+        }
+        
+    }
+
     protected function loadSession() {
         $this->data['chat_id'] = $this->chat->getId();
         $this->data['user_id'] = -1;
