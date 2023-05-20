@@ -336,7 +336,7 @@ class TTBot extends Api {
                     $this->session->get('chat_id'), 
                     $this->session->get('user_id'), 
                     $this->session->get('current_history_is_text', 0), 
-                    $this->session->get('current_history_data')
+                    $this->session->get('current_history_data', '--none is set--')
             );
         
     }
