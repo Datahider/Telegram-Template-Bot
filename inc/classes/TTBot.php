@@ -11,7 +11,8 @@
  * @author drweb
  */
 
-use Telegram\Bot\Api; 
+use Telegram\Bot\Api;
+use Telegram\Bot\Objects;
 
 class TTBot extends Api {
     
