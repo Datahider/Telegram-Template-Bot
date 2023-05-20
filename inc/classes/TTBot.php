@@ -448,13 +448,13 @@ class TTBot extends Api {
         }
     }
     
-    public function toAdmin($text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
+    public function toAdmin($text, $parse_mode='Plain', $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
         global $config;
         $chat_id = $config->admin;
         $this->toChat($chat_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
     }
     
-    public function toChat($chat_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params) {
+    public function toChat($chat_id, $text, $parse_mode='Plain', $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
         $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
         $params['chat_id'] = $chat_id;
         try {
