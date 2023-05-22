@@ -259,7 +259,7 @@ class TTBot extends Api {
             return;
         }
         
-        $this->initSessionByInlineQueryUpdateObject($chat_member_update);
+        $this->initSessionByChatmemberUpdateObject($chat_member_update);
     }
     
     protected function initSessionByChatMember($update) {
