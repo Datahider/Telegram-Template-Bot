@@ -471,6 +471,10 @@ class TTBot extends Api {
     public function toAdmin($text, $parse_mode='Plain', $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
         global $config;
         $chat_id = $config->admin;
+        
+        if (!is_string($text)) {
+            $text = mb_substr(print_r($text, true), 0, 2048);
+        }
         $this->toChat($chat_id, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
     }
     
