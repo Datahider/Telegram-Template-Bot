@@ -38,11 +38,15 @@ class TTSession {
     }
 
     protected function loadSession() {
-        $this->data['chat_id'] = $this->chat->getId();
+        $this->data['chat_id'] = -1;
         $this->data['user_id'] = -1;
         
         if ($this->user) {
             $this->data['user_id'] = $this->user->getId();
+        }
+        
+        if ($this->chat) {
+            $this->data['chat_id'] = $this->chat->getId();
         }
         
         $this->data['user'] = $this->user;
