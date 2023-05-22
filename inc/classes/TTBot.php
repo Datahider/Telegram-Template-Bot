@@ -224,8 +224,8 @@ class TTBot extends Api {
             $this->initSessionByEditedMessage($update);
             $this->initSessionByChannelPost($update);
             $this->initSessionByEditedChannelPost($update);
+            $this->initSessionByInlineQuery($update);
             // TODO - 
-            // $this->initSessionByInlineQuery($update)
             // $this->initSessionByChosenInlineResult($update)
             // $this->initSessionByShippingQuery($update)
             // $this->initSessionByPreCheckoutQuery($update)
@@ -242,13 +242,23 @@ class TTBot extends Api {
         }
     }
     
+    protected function initSessionByInlineQuery($update) {
+        $inline_query = $update->getInlineQuery();
+        
+        if (!$inline_query) {
+            return;
+        }
+        
+        
+    }
+    
     protected function initSessionByMyChatMember($update) {
         $chat_member_update = $update->get('my_chat_member');
         if (!$chat_member_update) {
             return;
         }
         
-        $this->initSessionByChatmemberUpdateObject($chat_member_update);
+        $this->initSessionByInlineQueryUpdateObject($chat_member_update);
     }
     
     protected function initSessionByChatMember($update) {
@@ -265,6 +275,14 @@ class TTBot extends Api {
         $from = $chat_member_update->getFrom();
         $chat = $chat_member_update->getChat();
         $this->session = $this->makeSession($from, $chat);   
+        
+        //TODO - Сделать добавление истории по этому событию
+        throw new Exception('Session initialized');
+    }
+    
+    protected function initSessionByInlineQueryUpdateObject($chat_member_update) {
+        $from = $chat_member_update->getFrom();
+        $this->session = $this->makeSession($from, false);   
         
         //TODO - Сделать добавление истории по этому событию
         throw new Exception('Session initialized');
@@ -545,5 +563,57 @@ class TTBot extends Api {
         return new Telegram\Bot\Objects\Message($response->getDecodedBody());
     }
 
+    public function getChat($chat_id) {
+        $response = $this->post('getChat', ['chat_id' => $chat_id]);
+
+        return new Telegram\Bot\Objects\Chat($response->getDecodedBody());
+    }
+    
+    public function closeGeneralForumTopic($chat_id) {
+        $response = $this->post('closeGeneralForumTopic', ['chat_id' => $chat_id]);
+
+        return new Telegram\Bot\Objects\Chat($response->getDecodedBody());
+    }
+    
+    public function hideGeneralForumTopic($chat_id) {
+        $response = $this->post('hideGeneralForumTopic', ['chat_id' => $chat_id]);
+
+        return new Telegram\Bot\Objects\Chat($response->getDecodedBody());
+    }
+    
+    public function createForumTopic(array $params) {
+        $response = $this->post('createForumTopic', $params);
+
+        return $response->getDecodedBody();
+    }
+    
+    public function setChatAdministratorCustomTitle(array $params) {
+        $response = $this->post('setChatAdministratorCustomTitle', $params);
+
+        return $response->getDecodedBody();
+    }
+    
+    public function toForumTopic($chat_id, $topic_id, $text, $parse_mode='Plain', $keyboard=null, $custom_keyboard=true, $keyboard_params=[]) {
+        $params = $this->prepareMessageParams(null, $text, $parse_mode, $keyboard, $custom_keyboard, $keyboard_params);
+        $params['chat_id'] = $chat_id;
+        $params['message_thread_id'] = $topic_id;
+        try {
+            $this->sendMessage($params);
+        } catch (Exception $e) {
+            $this->exceptionHandler($e);
+        }
+    }
+    
+    public function setChatDescription(array $params) {
+        $response = $this->post('setChatDescription', $params);
+
+        return $response->getDecodedBody();
+    }
+    
+    public function setChatPhoto(array $params) {
+        $response = $this->uploadFile('setChatPhoto', $params);
+
+        return $response->getDecodedBody();
+    }
     
 }
