@@ -249,6 +249,7 @@ class TTBot extends Api {
             return;
         }
         
+        $this->initSessionByInlineQueryUpdateObject($inline_query);
         
     }
     
@@ -280,8 +281,8 @@ class TTBot extends Api {
         throw new Exception('Session initialized');
     }
     
-    protected function initSessionByInlineQueryUpdateObject($chat_member_update) {
-        $from = $chat_member_update->getFrom();
+    protected function initSessionByInlineQueryUpdateObject($inline_query) {
+        $from = $inline_query->getFrom();
         $this->session = $this->makeSession($from, false);   
         
         //TODO - Сделать добавление истории по этому событию
