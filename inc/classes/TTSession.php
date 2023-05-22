@@ -46,7 +46,11 @@ class TTSession {
         }
         
         if ($this->chat) {
-            $this->data['chat_id'] = $this->chat->getId();
+            if (is_array($this->chat)) {
+                $this->data['chat_id'] = $this->chat['id'];
+            } else {
+                $this->data['chat_id'] = $this->chat->getId();
+            }
         }
         
         $this->data['user'] = $this->user;
