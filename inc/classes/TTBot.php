@@ -622,7 +622,7 @@ class TTBot extends Api {
     }
     
     public function getChatAdministrators($chat_id) {
-        $response = $this->post('getChatAdministrators', $params);
+        $response = $this->post('getChatAdministrators', [ 'chat_id' => $chat_id ]);
         
         return $response->getDecodedBody()['result'];
     }
