@@ -41,20 +41,37 @@ class TTBot extends Api {
     }
 
     public function __call($name, $arguments) {
-        $arg_count = count($arguments);
         $mod_name = strtolower(preg_replace("/[A-Z]/", "_$1", $name));
         $matches = [];
         
-        if (preg_match("/^(get_)(.+)", $mod_name, $matches)) {
-            if ($arg_count == 0) {
-                return $this->session->get($matches[1]);
-            } elseif (count($arguments) == 1) {
-                return $this->session->get($matches[1], $arguments[0]);
-            } else {
-                throw new Exception("Too many arguments.");
-            }
+        if (preg_match("/^(get_)(.+)$", $mod_name, $matches)) {
+            return $this->_get($matches[2], $arguments);
+        } elseif (preg_match("/^(set_)(.+)", $mod_name, $matches)) {
+            return $this->_set($matches[2], $arguments);
         } else {
             throw new Exception("Can't call $name");
+        }
+    }
+    
+    protected function _get($name, $arguments) {
+        $arg_count = count($arguments);
+
+        if ($arg_count == 0) {
+            return $this->session->get($name);
+        } elseif (count($arguments) == 1) {
+            return $this->session->get($name, $arguments[0]);
+        } else {
+            throw new Exception("Too many arguments.");
+        }
+    }
+    
+    protected function _set($name, $arguments) {
+        $arg_count = count($arguments);
+        
+        if ($arg_count == 1) {
+            $this->session->set($name, $arguments[0]);
+        } else {
+            throw new Exception("Can accept only one argument.");
         }
     }
     
