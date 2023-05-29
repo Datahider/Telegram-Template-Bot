@@ -44,9 +44,9 @@ class TTBot extends Api {
         $mod_name = strtolower(preg_replace("/[A-Z]/", "_$1", $name));
         $matches = [];
         
-        if (preg_match("/^(get_)(.+)$", $mod_name, $matches)) {
+        if (preg_match("/^(get_)(.+)$/", $mod_name, $matches)) {
             return $this->_get($matches[2], $arguments);
-        } elseif (preg_match("/^(set_)(.+)", $mod_name, $matches)) {
+        } elseif (preg_match("/^(set_)(.+)/", $mod_name, $matches)) {
             return $this->_set($matches[2], $arguments);
         } else {
             throw new Exception("Can't call $name");
