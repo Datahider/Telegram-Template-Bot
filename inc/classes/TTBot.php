@@ -39,6 +39,24 @@ class TTBot extends Api {
             return true;
         }
     }
+
+    public function __call($name, $arguments) {
+        $arg_count = count($arguments);
+        $mod_name = strtolower(preg_replace("/[A-Z]/", "_$1", $name));
+        $matches = [];
+        
+        if (preg_match("/^(get_)(.+)", $mod_name, $matches)) {
+            if ($arg_count == 0) {
+                return $this->session->get($matches[1]);
+            } elseif (count($arguments) == 1) {
+                return $this->session->get($matches[1], $arguments[0]);
+            } else {
+                throw new Exception("Too many arguments.");
+            }
+        } else {
+            throw new Exception("Can't call $name");
+        }
+    }
     
     public function commandProcessed($true=false) {
         if ($true) {
