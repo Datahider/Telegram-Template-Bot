@@ -41,15 +41,15 @@ class TTBot extends Api {
     }
 
     public function __call($name, $arguments) {
-        $mod_name = strtolower(preg_replace("/[A-Z]/", "_$1", $name));
+        $mod_name = strtolower(preg_replace("/([A-Z])/", "_$1", $name));
         $matches = [];
         
-        if (preg_match("/^(get_)(.+)$/", $mod_name, $matches)) {
+        if (preg_match("/^(my_)(.+)$/", $mod_name, $matches)) {
             return $this->_get($matches[2], $arguments);
         } elseif (preg_match("/^(set_)(.+)/", $mod_name, $matches)) {
             return $this->_set($matches[2], $arguments);
         } else {
-            throw new Exception("Can't call $name");
+            parent::__call($name, $arguments);
         }
     }
     
@@ -662,4 +662,11 @@ class TTBot extends Api {
         return $response->getDecodedBody()['result'];
     }
     
+    public function deleteMessage($params) {
+        return $this->post('deleteMessage', $params)->getDecodedBody();
+    }
+    
+    public function setMyCommands($params) {
+        return $this->post('setMyCommands', $params)->getDecodedBody();
+    }
 }
